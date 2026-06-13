@@ -1,0 +1,3 @@
+strategy,trade_opportunity_rate,overall_fill_rate,fill_rate_given_trade,average_net_value_given_fill,average_adverse_drift_given_fill,bad_fill_ratio_given_fill,number_traded,number_filled
+Always passive,1.0,0.99275,0.99275,0.007531055548899764,0.05390122794049891,0.47897255099471164,8000,7942
+Filtered passive,0.554625,0.547375,0.9869281045751634,0.08824679601742436,0.010399424890706513,0.15437314455355103,4437,4379
