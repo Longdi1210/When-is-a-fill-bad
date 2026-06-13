@@ -31,32 +31,24 @@ After a fill, execution quality is evaluated over a fixed markout horizon.
 For a passive buy order, the post-fill mid-price drift is
 
 $$
-\Delta m_{t,\tau}
-=
-m_{t+\tau} - m_t^{\mathrm{fill}}.
+\Delta m_{t,\tau} = m_{t+\tau} - m_t^{\mathrm{fill}}.
 $$
 
 The order initially captures half the spread:
 
 $$
-SC_t
-=
-m_t^{\mathrm{fill}} - p_t^{\mathrm{fill}}.
+SC_t = m_t^{\mathrm{fill}} - p_t^{\mathrm{fill}}.
 $$
 
 Net execution value is defined as
 
 $$
-NEV_{t,\tau}
-=
-SC_t + \Delta m_{t,\tau}.
+NEV_{t,\tau} = SC_t + \Delta m_{t,\tau}.
 $$
 
 A fill is classified as bad when
 
-$$
-NEV_{t,\tau} < 0.
-$$
+$$ NEV_{t,\tau} < 0. $$
 
 ## Interpretation Boundary
 
