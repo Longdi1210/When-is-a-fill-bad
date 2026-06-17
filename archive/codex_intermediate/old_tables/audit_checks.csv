@@ -1,0 +1,16 @@
+check,passed,detail
+no_overlapping_obs_ids_train_validation,True,
+no_overlapping_obs_ids_train_test,True,
+no_overlapping_obs_ids_validation_test,True,
+chronological_train_before_validation,True,2182 < 2183
+chronological_validation_before_test,True,2825 < 2826
+no_negative_time_to_fill,True,
+markout_10_after_fill,True,
+markout_50_after_fill,True,
+markout_100_after_fill,True,
+markout_500_after_fill,True,
+no_duplicated_order_observations,True,
+feature_allowlist_no_future_labels,True,
+no_zero_or_negative_spread,True,
+no_negative_queue_ahead,True,
+target_columns_not_in_features,True,

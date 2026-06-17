@@ -1,0 +1,39 @@
+{
+  "dataset": {
+    "data_type": "synthetic_lob",
+    "events": 5000,
+    "hypothetical_orders": 9304,
+    "fills": 5105,
+    "fill_rate": 0.548688736027515,
+    "fill_horizon_events": 80,
+    "value_markout_horizon_events": 100,
+    "queue_ahead_fraction": 0.2,
+    "order_size": 5
+  },
+  "fill_model_test": {
+    "split": "test",
+    "roc_auc": 0.7680706122197543,
+    "brier_score": 0.23173195430763427,
+    "fill_rate": 0.45703544575725025,
+    "n": 1862
+  },
+  "markout_model_test": {
+    "split": "test",
+    "mae": 5.102416487574974,
+    "rmse": 8.314407161090774,
+    "mean_signed_error": -0.9083417778746589,
+    "rank_correlation": 0.11662622974258305,
+    "n": 783
+  },
+  "best_policy_by_ev": {
+    "policy": "top_predicted_posting_value",
+    "selected_n": 186,
+    "fill_rate": 0.46774193548387094,
+    "avg_markout_per_fill": -0.3205548344291553,
+    "avg_spread_capture_ticks": 1.0241935483870968,
+    "expected_value_per_opportunity": 0.29441790002507257,
+    "expected_value_per_fill": 0.629445165570845,
+    "fraction_adverse_fills": 0.5632183908045977
+  },
+  "audit_passed": true
+}

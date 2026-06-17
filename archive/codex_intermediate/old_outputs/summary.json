@@ -1,0 +1,41 @@
+{
+  "profile": {
+    "title": "From attosecond FEL simulation to high-frequency market microstructure",
+    "research_question": "Can the numerical methods used to study attosecond free-electron-laser pulse generation at SwissFEL be transferred to a reproducible limit-order-book laboratory for studying liquidity, delay, queue dynamics, and shock recovery?",
+    "hypothesis": "A thesis-style workflow based on noise-driven dynamics, delay control, taper-like parameter optimisation, and seed-robust validation can expose how latency-sensitive liquidity provision changes spread, imbalance, volatility, and post-shock resilience.",
+    "research_features": {
+      "thesis_title": "Numerical Study of the Attosecond Free-Electron Laser Pulse Generation in the Soft X-ray Regime at the SwissFEL",
+      "doctoral_angle": "EPFL PhD thesis: numerical study of attosecond FEL pulse trains at SwissFEL Athos using SASE/ESASE, slicing, mode-locking, transverse gradient undulator configuration, slippage analysis, superradiance interpretation, and undulator taper optimisation.",
+      "career_angle": "High-frequency quant transition project: translate the thesis strengths into exchange simulation, noise-started order-flow dynamics, queue-aware microstructure features, delay/latency stress tests, and reproducible parameter sweeps.",
+      "mechanism": "Transient information shock plus adaptive liquidity replenishment, interpreted through FEL-inspired concepts: SASE-like noise start, ESASE-like current spikes, slicing-like selective resonance, mode-locking-like delay control, and TGU-like strong taper optimisation.",
+      "main_outcomes": [
+        "quoted_spread",
+        "depth_imbalance",
+        "microprice_deviation",
+        "order_flow_imbalance",
+        "realized_volatility",
+        "resilience_score"
+      ]
+    }
+  },
+  "steps": 500,
+  "trades": 174,
+  "trade_volume": 782,
+  "average_spread": 1.044,
+  "average_abs_imbalance": 0.02788615040712986,
+  "average_abs_microprice_deviation": 0.014480002147534834,
+  "average_abs_order_flow_imbalance": 0.16,
+  "realized_volatility": 2.236119390867333e-06,
+  "resilience_score": 0.8905472636815921,
+  "last_snapshot": {
+    "step": 500,
+    "best_bid": 9999,
+    "best_ask": 10000,
+    "mid_price": 9999.5,
+    "spread": 1,
+    "bid_depth": 817,
+    "ask_depth": 826,
+    "imbalance": -0.005477784540474742,
+    "last_trade_price": 9999
+  }
+}

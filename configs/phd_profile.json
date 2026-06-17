@@ -1,0 +1,25 @@
+{
+  "title": "From attosecond FEL simulation to high-frequency market microstructure",
+  "research_question": "Can the numerical methods used to study attosecond free-electron-laser pulse generation at SwissFEL be transferred to a reproducible limit-order-book laboratory for studying liquidity, delay, queue dynamics, and shock recovery?",
+  "hypothesis": "A thesis-style workflow based on noise-driven dynamics, delay control, taper-like parameter optimisation, and seed-robust validation can expose how latency-sensitive liquidity provision changes spread, imbalance, volatility, and post-shock resilience.",
+  "shock_start": 180,
+  "shock_end": 260,
+  "informed_agent_share": 0.18,
+  "resilience_agent_share": 0.16,
+  "cancellation_pressure": 0.08,
+  "order_flow_autocorrelation": 0.35,
+  "research_features": {
+    "thesis_title": "Numerical Study of the Attosecond Free-Electron Laser Pulse Generation in the Soft X-ray Regime at the SwissFEL",
+    "doctoral_angle": "EPFL PhD thesis: numerical study of attosecond FEL pulse trains at SwissFEL Athos using SASE/ESASE, slicing, mode-locking, transverse gradient undulator configuration, slippage analysis, superradiance interpretation, and undulator taper optimisation.",
+    "career_angle": "High-frequency quant transition project: translate the thesis strengths into exchange simulation, noise-started order-flow dynamics, queue-aware microstructure features, delay/latency stress tests, and reproducible parameter sweeps.",
+    "mechanism": "Transient information shock plus adaptive liquidity replenishment, interpreted through FEL-inspired concepts: SASE-like noise start, ESASE-like current spikes, slicing-like selective resonance, mode-locking-like delay control, and TGU-like strong taper optimisation.",
+    "main_outcomes": [
+      "quoted_spread",
+      "depth_imbalance",
+      "microprice_deviation",
+      "order_flow_imbalance",
+      "realized_volatility",
+      "resilience_score"
+    ]
+  }
+}

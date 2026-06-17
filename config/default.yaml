@@ -1,0 +1,28 @@
+seed: 42
+output_dir: outputs
+data_mode: synthetic_validation
+instrument: BTC-USD
+venue: synthetic
+btc_data_path: data/raw/btc_usd_events.csv
+steps: 3500
+fundamental_price: 10000
+tick_size: 1
+order_size: 5
+fill_horizon: 80
+markout_horizons: [10, 50, 100, 500]
+markout_horizon_for_value: 100
+lookback_windows: [5, 10, 20, 50, 100, 200, 500]
+flow_weighting: uniform
+shuffle_block_size: 200
+fees_ticks: 0.05
+queue_ahead_fraction: 0.2
+queue_ahead_max: 50
+queue_ahead_sensitivity: [0.1, 0.2, 0.45]
+min_spread_ticks: 1
+train_fraction: 0.6
+validation_fraction: 0.2
+eligible_every_n_events: 1
+rolling_window: 20
+models:
+  fill: logistic
+  markout: ridge

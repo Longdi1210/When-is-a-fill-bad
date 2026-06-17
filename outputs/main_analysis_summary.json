@@ -1,0 +1,9 @@
+{
+  "data_source": "synthetic_validation",
+  "best_window_by_m3_fill_auc": 50,
+  "test_m3_fill_auc": 0.5261121242263483,
+  "test_m3_minus_m2_auc": -0.0008703580901856522,
+  "null_m3_minus_m2_auc": -0.08615487552391077,
+  "audit_passed": true,
+  "real_btc_results_available": false
+}

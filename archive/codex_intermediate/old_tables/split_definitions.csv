@@ -1,0 +1,4 @@
+split,start_step,end_step,n
+train,1,2182,3856
+validation,2183,2825,1286
+test,2826,3500,1286

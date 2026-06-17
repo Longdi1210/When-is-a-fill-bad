@@ -1,0 +1,2 @@
+data_source,instrument,venue,events,hypothetical_orders,fills,fill_rate,real_btc_available
+synthetic_validation,BTC-USD,synthetic,3500,6428,3669,0.570784069695084,False
