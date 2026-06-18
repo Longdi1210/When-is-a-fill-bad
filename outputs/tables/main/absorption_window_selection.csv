@@ -1,0 +1,4 @@
+candidate_absorption_window,selected,selection_basis
+2,False,pre-specified preferred window; no test-set tuning
+5,True,pre-specified preferred window; no test-set tuning
+10,False,pre-specified preferred window; no test-set tuning

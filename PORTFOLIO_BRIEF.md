@@ -4,44 +4,48 @@
 
 Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?
 
-## Relevance
+## Research Positioning
 
-Fill likelihood and execution quality are not the same object. A passive quote may be more likely to trade when market pressure is moving through visible liquidity, and that same state may create adverse post-fill or post-quote markout.
+This is a controlled execution-quality research project. The synthetic layer validates exact passive-fill labels. The real Coinbase BTC layer uses one-second quote-pressure episodes as a proxy because exact FIFO fills are not available.
 
-## Research Architecture
+## Identification Upgrade
 
-- Controlled synthetic exact-fill experiment for passive-order replay and signed markout labels.
-- Coinbase BTC one-second validation layer with 1,030,728 observations and 15 visible book levels.
-- Side-adjusted buy/sell markout convention where positive is favorable to the passive trader.
-- Static pressure baselines using market flow, cancellation, replenishment, and displayed depth.
-- Dynamic shock analysis: pressure shock, potential depth penetration, absorption, quote survival, and recovery path.
-- Chronological validation, stratified local null, focused tests, and one-command reproduction.
+An initial dynamic result showed large separation, but the time windows overlapped. The final version hardens the design:
 
-## Result
+```text
+shock formation [t-10s, t]
+early absorption observation (t, t+5s]
+future outcome (t+5s, t+5s+H]
+```
 
-The static proxy hypothesis is weak: adding cancellation and replenishment to market pressure does not reliably improve the real-data baseline. The stronger result comes from the dynamic representation. On the test period, multi-level shock absorption separates adverse post-quote states much more clearly than market-only or static P3 proxies.
+The absorption score excludes quote survival and future markout. This turns the project from a descriptive LOB episode study into a stricter predictive microstructure audit.
 
-| Side | Static market-only | Static P3 | Dynamic shock absorption |
+## Evidence
+
+On 22,300 strict shock episodes, early absorption separates future passive-side outcomes at short horizons:
+
+| Side | 10s strong - weak markout | 30s strong - weak markout | 60s strong - weak markout |
 |---|---:|---:|---:|
-| buy | -2.4431 bps | -1.7760 bps | -10.3845 bps |
-| sell | -1.7864 bps | -1.5306 bps | -11.2888 bps |
+| buy | +0.8446 bps | +1.5725 bps | +1.7922 bps |
+| sell | +0.6761 bps | +1.6727 bps | +0.4369 bps |
 
-The result is framed carefully: dynamic state ordering is informative, while linear predictive R2 remains small and exact real fills are not observed.
+The 10s and 30s effects have positive block-bootstrap confidence intervals on both sides. The 60s result is weaker, and the expanded 200-seed stratified null is directionally supportive but not decisive.
 
 ## Technical Signal
 
 - High-frequency data engineering and Parquet-based processing.
-- Market-microstructure label design.
-- Side-aware sign conventions.
-- Timestamp-aware future response construction.
-- Mechanism testing under chronological validation.
-- Null-model design and negative-result discipline.
-- Compact, reproducible research packaging.
+- Side-adjusted markout conventions.
+- Temporal leakage audit.
+- Non-overlapping label design.
+- Train-only thresholding and scaling.
+- Block-bootstrap uncertainty.
+- Stratified local null with 200 seeds.
+- Clear separation of supported, partial, and unsupported claims.
 
 ## Evidence Boundary
 
-The real BTC dataset supports quote-pressure and visible-depth validation, not exact FIFO queue reconstruction. The project makes no claim of live trading profitability or production execution readiness.
+The real BTC dataset supports quote-pressure validation, not exact FIFO queue reconstruction. The project makes no live trading, profitability, optimal-execution, or production-system claim.
 
 ## Next Empirical Step
 
-Run the same labeling and validation logic on single-venue L3/MBO data with order identifiers and exact queue updates.
+Run the same strict labeling logic on single-venue L3/MBO data with order identifiers and exact queue updates.

@@ -1,0 +1,10 @@
+sequence,side,metric,real_value,null_mean,empirical_p_two_sided,one_sided_percentile,null_seed_count
+empirical_p_value,buy,strong_minus_weak_markout,1.7921736574053295,0.38126191427199096,0.1044776119402985,0.92,200
+empirical_p_value,buy,quote_survival_difference,0.028321711720317166,-0.007505276715587347,0.21393034825870647,0.045,200
+empirical_p_value,buy,dynamic_vs_static_improvement,3.3413180780808727,1.6623257849387505,0.1691542288557214,0.165,200
+empirical_p_value,sell,strong_minus_weak_markout,0.43688367095100533,0.12258772117803421,0.6517412935323383,0.645,200
+empirical_p_value,sell,quote_survival_difference,0.006239152343093912,0.01538339468674766,0.835820895522388,0.685,200
+empirical_p_value,sell,dynamic_vs_static_improvement,0.40872533725822835,0.39347587843836807,0.7512437810945274,0.505,200
+empirical_p_value,combined,strong_minus_weak_markout,1.0881145923954956,0.17480972765681724,0.15422885572139303,0.89,200
+empirical_p_value,combined,quote_survival_difference,0.01749102084944587,0.004619828636910279,0.2835820895522388,0.215,200
+empirical_p_value,combined,dynamic_vs_static_improvement,1.8243165257066685,0.9352286207773491,0.19402985074626866,0.185,200

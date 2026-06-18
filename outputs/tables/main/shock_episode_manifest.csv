@@ -1,7 +1,9 @@
 metric,value
-episode_count,22372.0
-train_count,10745.0
-validation_count,6747.0
-test_count,4880.0
-selected_window,10.0
+episode_count,22300.0
+train_count,10700.0
+validation_count,6732.0
+test_count,4868.0
+selected_shock_window,10.0
+selected_absorption_window,5.0
 threshold_quantile,0.95
+null_seed_count,200.0

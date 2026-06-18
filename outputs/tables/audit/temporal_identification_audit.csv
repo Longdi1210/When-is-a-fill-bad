@@ -1,0 +1,10 @@
+variable,measurement_start,measurement_end,role,stage,overlaps_outcome,potential_leakage,required_fix
+shock_notional_10s,t-10s,t,shock intensity,shock,False,False,none
+lag_depth_1/3/5/10/15,t-1 observation,t-1 observation,pre-shock visible-depth proxy,shock,False,False,retain as pre-shock proxy
+flow_absorption_5s,t,t+5s,early limit-minus-cancel response,absorption,False,False,primary absorption component
+depth_recovery_5_absorption_5s,t,t+5s,early top-5 depth recovery,absorption,False,False,primary absorption component
+spread_recovery_absorption_5s,t,t+5s,early spread recovery,absorption,False,False,primary absorption component
+strict_absorption_score,t,t+5s,train-scaled early absorption state,absorption,False,False,quote survival removed from score
+future_markout_after_absorption_*,t+5s,t+10s / 30s / 60s / 120s / 300s,primary future side-adjusted markout,outcome,True,False,baseline moved to absorption-window end
+future_quote_survives_*,t+5s,t+10s / 30s / 60s / 120s / 300s,primary conditional quote-survival outcome,outcome,True,False,not used in absorption score
+episode_markout_from_preshock_*,t-1 observation,t+10s / 30s / 60s / 120s / 300s,descriptive full episode path,outcome,True,descriptive only,excluded from primary predictive claim

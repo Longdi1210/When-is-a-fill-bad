@@ -3,26 +3,19 @@
 
 **Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?**
 
-This repository studies the distinction between execution likelihood and execution quality. The synthetic layer provides exact hypothetical passive fills and signed post-fill markouts. The real Coinbase BTC layer cannot observe FIFO fills, so it validates the same mechanism through quote-pressure episodes, visible-depth penetration, post-shock absorption, best-quote survival, and future side-adjusted markout.
+This repository studies execution quality rather than generic price prediction. The synthetic layer provides exact hypothetical passive fills and signed post-fill markouts. The real Coinbase BTC layer cannot observe FIFO fills, so it validates the mechanism with quote-pressure shocks, visible-depth penetration, early book absorption, later quote survival, and future side-adjusted markout.
 
-The central empirical lesson is restrained: a static composite execution-pressure proxy is not enough. In the real BTC sample, separating the process into **shock -> penetration -> absorption -> quote survival -> markout response** produces a clearer state ranking than market-only or static P3 proxies, but the result remains a proxy study rather than a claim about exact live fills.
-
-![Dynamic versus static representation](outputs/figures/dynamic_lob_main/05_dynamic_vs_static.png)
-
-## Evidence Design
+The final audit uses a strict temporal design:
 
 ```text
-Synthetic controlled experiment
--> exact hypothetical passive fills
--> fill likelihood
--> post-fill signed markout
-
-Real Coinbase BTC validation
--> one-second quote-pressure episodes
--> potential visible-depth penetration
--> absorption and quote-survival response
--> future side-adjusted post-quote markout
+pre-shock state -> shock window [t-10s, t]
+early absorption observation -> (t, t+5s]
+future outcome -> (t+5s, t+5s+H]
 ```
+
+The strict result is more conservative than the earlier descriptive result. The first five seconds of book response separate later quote survival and markout at short horizons, but the effect attenuates by 60 seconds and is not strongly separated from the expanded stratified null. This is now presented as a bounded predictive microstructure result, not a trading signal.
+
+![Strict temporal identification](outputs/figures/dynamic_lob_main/01_temporal_identification.png)
 
 ## Data Boundary
 
@@ -33,41 +26,48 @@ Real Coinbase BTC validation
 | Frequency | ~1 second |
 | Visible depth | 15 levels |
 | Date range | 2021-04-07 to 2021-04-19 UTC |
-| Available activity | market / limit / cancel notional |
+| Valid strict shock episodes | 22,300 |
+| Train / validation / test episodes | 10,700 / 6,732 / 4,868 |
 | Exact FIFO fills | unavailable |
 | Live trading claim | none |
 
-The real-data layer uses one-second snapshots and interval aggregates. It supports empirical quote-pressure validation, not order-level queue reconstruction.
+## Main Strict Result
+
+Absorption is measured only in the first 5 seconds after the shock. Future markout is then measured from the midpoint at `t+5s`, not from the pre-shock midpoint.
+
+| Side | Total time after shock | Strong - weak future markout | Block-bootstrap CI | Strong - weak quote survival |
+|---|---:|---:|---:|---:|
+| buy | 10s | +0.8446 bps | [+0.3975, +1.3342] | +7.63 pp |
+| buy | 30s | +1.5725 bps | [+0.3329, +3.2433] | +3.89 pp |
+| buy | 60s | +1.7922 bps | [-0.1318, +3.8304] | +2.83 pp |
+| sell | 10s | +0.6761 bps | [+0.2724, +1.1462] | +6.47 pp |
+| sell | 30s | +1.6727 bps | [+0.5720, +3.3205] | +4.79 pp |
+| sell | 60s | +0.4369 bps | [-1.3973, +2.3350] | +0.62 pp |
+
+Positive strong-minus-weak markout means stronger early absorption is followed by better passive-side outcomes. The short-horizon result is supported on both sides; the 60-second result is weaker.
+
+## Null Result
+
+The expanded stratified null uses 200 seeds and preserves date, side, shock-intensity bin, pre-shock depth bin, spread regime, volatility regime, and time-of-day block.
+
+At 60 seconds:
+
+| Side | Real strong - weak markout | Null mean | Empirical two-sided p-value |
+|---|---:|---:|---:|
+| buy | +1.7922 bps | +0.3813 bps | 0.1045 |
+| sell | +0.4369 bps | +0.1226 bps | 0.6517 |
+| combined | +1.0881 bps | +0.1748 bps | 0.1542 |
+
+The null is directionally supportive for the buy side but not decisive. The final claim is therefore partial: strict early absorption contains short-horizon state information, while the longer-horizon and null-adjusted evidence is mixed.
 
 ## Research System
 
 - Synthetic exact-fill experiment for controlled passive-order replay.
-- Million-row Coinbase BTC data pipeline with schema audit and Parquet conversion.
+- Real BTC data pipeline with schema audit, Parquet conversion, and canonical LOB features.
 - Side-adjusted passive-buy and passive-sell markout conventions.
-- Static execution-pressure baselines: market-only, market + cancellation, and market + cancellation - replenishment.
-- Dynamic shock analysis using 15-level visible depth, potential penetration, absorption, quote survival, and recovery paths.
-- Chronological train/validation/test evaluation, local null tests, and reproducible output tables and figures.
-
-## Main Result
-
-The first real-data proxy test found that richer static pressure signals did not reliably outperform market-order pressure alone. That negative result motivated a narrower dynamic audit: condition on large quote-pressure shocks, then measure whether the visible book absorbs or fails to absorb the shock.
-
-On the untouched test period, the dynamic multi-level shock-absorption representation produces substantially more adverse high-minus-low markout ordering than the static baselines:
-
-| Side | Representation | High-minus-low 60s markout | Rank correlation |
-|---|---|---:|---:|
-| buy | market-only static | -2.4431 bps | -0.0244 |
-| buy | static P3 proxy | -1.7760 bps | -0.0148 |
-| buy | multi-level shock absorption | -10.3845 bps | -0.2416 |
-| sell | market-only static | -1.7864 bps | -0.0406 |
-| sell | static P3 proxy | -1.5306 bps | +0.0056 |
-| sell | multi-level shock absorption | -11.2888 bps | -0.2915 |
-
-Absorption states are economically interpretable. Weak absorption has negative 60s markout and low quote survival; strong absorption has positive 60s markout and materially higher quote survival.
-
-## Null Result And Boundary
-
-A stratified local null preserves date, side, and potential penetration class while shuffling markout alignment. The dynamic representation remains more adverse than the null average in both directions, but linear projection R2 remains small. The result is best read as **state ordering and mechanism diagnostics**, not as a high-accuracy return prediction model.
+- Static pressure baselines retained as a falsified simple proxy.
+- Dynamic shock analysis using 15-level visible depth, potential penetration, early absorption, and later outcomes.
+- Temporal leakage audit, block-bootstrap uncertainty, expanded stratified null, and concentration diagnostics.
 
 ## Reproduction
 
@@ -87,14 +87,14 @@ make reproduce
 
 - Exact real passive fills and FIFO queue position are unavailable.
 - One-second aggregation removes intrasecond event order.
-- Potential penetration is measured against visible depth, not actual hidden liquidity or order IDs.
+- Potential penetration is measured against visible displayed depth, not hidden liquidity.
 - The sample covers one venue and a short date range.
-- Linear predictive R2 is small even when dynamic state ordering is clear.
-- No live trading, market-making, or profitability claim is made.
+- The strict result is strongest at 10s and 30s; longer-horizon evidence is mixed.
+- No live trading, market-making, optimal-execution, or profitability claim is made.
 
 ## Review Path
 
-30 seconds: README figure and result table.
+30 seconds: README figure and strict result table.
 
 3 minutes: [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md).
 

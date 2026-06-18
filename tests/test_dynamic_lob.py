@@ -10,8 +10,12 @@ from fillbad.multilevel_flow import (
 )
 from fillbad.shock_analysis import (
     classify_absorption,
+    classify_strict_absorption,
+    effective_nonoverlap_count,
+    empirical_p_value,
     enforce_refractory,
     fit_shock_thresholds,
+    robust_location_summary,
     stratified_absorption_null,
 )
 
@@ -126,3 +130,66 @@ def test_stratified_absorption_null_is_deterministic_and_preserves_strata():
     b = stratified_absorption_null(episodes, seed=7)
     assert a["markout_60s"].tolist() == b["markout_60s"].tolist()
     assert sorted(a["markout_60s"].tolist()) == [1.0, 2.0, 3.0, 4.0]
+
+
+def test_strict_absorption_score_excludes_quote_survival_and_future_markout():
+    episodes = pd.DataFrame(
+        {
+            "flow_absorption_5s": [-2, -1, 0, 1, 2, 3],
+            "depth_recovery_5_absorption_5s": [-2, -1, 0, 1, 2, 3],
+            "spread_recovery_absorption_5s": [-2, -1, 0, 1, 2, 3],
+            "future_quote_survives_60s": [1, 1, 1, 0, 0, 0],
+            "future_markout_after_absorption_60s": [100, 100, 100, -100, -100, -100],
+        }
+    )
+    train_mask = pd.Series([True, True, True, True, False, False])
+    baseline, params = classify_strict_absorption(episodes, train_mask, absorption_window=5)
+    changed = episodes.copy()
+    changed["future_quote_survives_60s"] = 1 - changed["future_quote_survives_60s"]
+    changed["future_markout_after_absorption_60s"] *= -1
+    rerun, _ = classify_strict_absorption(changed, train_mask, absorption_window=5)
+    assert baseline["strict_absorption_score"].equals(rerun["strict_absorption_score"])
+    assert set(params["components"]) == {
+        "flow_absorption_5s",
+        "depth_recovery_5_absorption_5s",
+        "spread_recovery_absorption_5s",
+    }
+
+
+def test_empirical_p_value_uses_plus_one_correction():
+    null = np.array([0.1, 0.2, 0.3, 0.4])
+    assert empirical_p_value(0.5, null, two_sided=True) == 1 / 5
+    assert empirical_p_value(0.25, null, two_sided=False) == 3 / 5
+
+
+def test_effective_nonoverlap_count_respects_horizon_spacing():
+    timestamps = pd.to_datetime(
+        ["2021-01-01 00:00:00", "2021-01-01 00:00:30", "2021-01-01 00:01:00", "2021-01-01 00:02:01"],
+        utc=True,
+    )
+    assert effective_nonoverlap_count(pd.Series(timestamps), 60) == 3
+
+
+def test_robust_location_summary_reports_tail_concentration():
+    summary = robust_location_summary(pd.Series([1.0, 1.0, 1.0, 100.0]))
+    assert summary["mean"] > summary["median"]
+    assert summary["top_1pct_share"] > 0
+
+
+def test_stratified_null_preserves_group_columns_and_shuffles_future_outcomes():
+    episodes = pd.DataFrame(
+        {
+            "date": ["2021-01-01"] * 6,
+            "side": ["buy"] * 6,
+            "shock_intensity_bin": ["0"] * 6,
+            "pre_depth_bin": ["1"] * 6,
+            "spread_regime": ["1"] * 6,
+            "volatility_regime": ["2"] * 6,
+            "time_of_day_block": ["0"] * 6,
+            "future_markout_after_absorption_60s": [1, 2, 3, 4, 5, 6],
+            "strict_absorption_score": [10, 11, 12, 13, 14, 15],
+        }
+    )
+    out = stratified_absorption_null(episodes, seed=3)
+    assert out["strict_absorption_score"].tolist() == episodes["strict_absorption_score"].tolist()
+    assert sorted(out["future_markout_after_absorption_60s"].tolist()) == [1, 2, 3, 4, 5, 6]

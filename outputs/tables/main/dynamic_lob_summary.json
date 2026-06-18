@@ -1,5 +1,8 @@
 {
-  "episode_count": 22372,
+  "episode_count": 22300,
+  "train_count": 10700,
+  "validation_count": 6732,
+  "test_count": 4868,
   "thresholds": [
     {
       "side": "buy",
@@ -15,29 +18,45 @@
     }
   ],
   "absorption_params": {
-    "net_absorption_30s": {
-      "mean": 196.8108115544986,
-      "std": 367.88916132373043
+    "absorption_window": 5,
+    "components": [
+      "flow_absorption_5s",
+      "depth_recovery_5_absorption_5s",
+      "spread_recovery_absorption_5s"
+    ],
+    "flow_absorption_5s": {
+      "mean": 32.28260666364599,
+      "std": 75.32115786752678
     },
-    "depth_recovery_5_30s": {
-      "mean": 26.03294035780215,
-      "std": 80.62373547077719
+    "depth_recovery_5_absorption_5s": {
+      "mean": 9.585233148016275,
+      "std": 51.01078574675439
+    },
+    "spread_recovery_absorption_5s": {
+      "mean": -71.85734668194904,
+      "std": 244.66194040407953
     },
     "score_thresholds": {
-      "weak_max": -0.4499158862682118,
-      "strong_min": 0.4560445307452285
+      "weak_max": -0.24082498496948457,
+      "strong_min": 0.03136738069287596
     }
   },
-  "runtime_seconds": 26.801620959013235,
-  "main_window": 10,
-  "response_horizons": [
-    1,
-    2,
-    5,
+  "runtime_seconds": 48.275965208013076,
+  "main_shock_window": 10,
+  "main_absorption_window": 5,
+  "total_times_after_shock": [
     10,
     30,
     60,
     120,
     300
-  ]
+  ],
+  "outcome_horizons_after_absorption": [
+    5,
+    25,
+    55,
+    115,
+    295
+  ],
+  "null_seed_count": 200
 }
