@@ -1,0 +1,3 @@
+side,window,threshold_quantile,threshold_value
+buy,10,0.95,0.9442480775640254
+sell,10,0.95,1.258225679963949

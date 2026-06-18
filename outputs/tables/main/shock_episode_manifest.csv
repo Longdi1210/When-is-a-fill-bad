@@ -1,0 +1,7 @@
+metric,value
+episode_count,22372.0
+train_count,10745.0
+validation_count,6747.0
+test_count,4880.0
+selected_window,10.0
+threshold_quantile,0.95

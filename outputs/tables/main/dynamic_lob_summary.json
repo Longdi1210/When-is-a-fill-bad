@@ -1,0 +1,43 @@
+{
+  "episode_count": 22372,
+  "thresholds": [
+    {
+      "side": "buy",
+      "window": 10,
+      "threshold_quantile": 0.95,
+      "threshold_value": 0.9442480775640254
+    },
+    {
+      "side": "sell",
+      "window": 10,
+      "threshold_quantile": 0.95,
+      "threshold_value": 1.258225679963949
+    }
+  ],
+  "absorption_params": {
+    "net_absorption_30s": {
+      "mean": 196.8108115544986,
+      "std": 367.88916132373043
+    },
+    "depth_recovery_5_30s": {
+      "mean": 26.03294035780215,
+      "std": 80.62373547077719
+    },
+    "score_thresholds": {
+      "weak_max": -0.4499158862682118,
+      "strong_min": 0.4560445307452285
+    }
+  },
+  "runtime_seconds": 26.801620959013235,
+  "main_window": 10,
+  "response_horizons": [
+    1,
+    2,
+    5,
+    10,
+    30,
+    60,
+    120,
+    300
+  ]
+}

@@ -1,55 +1,47 @@
 # Portfolio Brief
 
-## Problem
+## Question
 
-Can easy passive execution coincide with poor execution quality?
+Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?
 
-## Data
+## Relevance
 
-- 1,030,728 real Coinbase BTC observations.
-- 15 LOB levels.
-- Market, limit, and cancel notional.
-- 2021-04-07 to 2021-04-19 UTC.
+Fill likelihood and execution quality are not the same object. A passive quote may be more likely to trade when market pressure is moving through visible liquidity, and that same state may create adverse post-fill or post-quote markout.
 
-## Project Scope
+## Research Architecture
 
-- Controlled synthetic exact-fill layer.
-- Real execution-pressure proxy layer.
-- Side-adjusted markout construction.
-- Chronological evaluation.
-- Multi-scale response map.
-- Daily stability analysis.
-- Local shuffled null.
-- Reproducible pipeline.
+- Controlled synthetic exact-fill experiment for passive-order replay and signed markout labels.
+- Coinbase BTC one-second validation layer with 1,030,728 observations and 15 visible book levels.
+- Side-adjusted buy/sell markout convention where positive is favorable to the passive trader.
+- Static pressure baselines using market flow, cancellation, replenishment, and displayed depth.
+- Dynamic shock analysis: pressure shock, potential depth penetration, absorption, quote survival, and recovery path.
+- Chronological validation, stratified local null, focused tests, and one-command reproduction.
 
-## Main Finding
+## Result
 
-Market-order pressure provides the most stable simple ordering of future markout. Adding cancellation and replenishment does not robustly improve out-of-sample performance. The adverse relation is strongest at short and intermediate horizons and is concentrated in selected days.
+The static proxy hypothesis is weak: adding cancellation and replenishment to market pressure does not reliably improve the real-data baseline. The stronger result comes from the dynamic representation. On the test period, multi-level shock absorption separates adverse post-quote states much more clearly than market-only or static P3 proxies.
 
-| Question | Result |
-|---|---|
-| Does execution pressure order future markout? | Partly, at short/intermediate horizons |
-| Does full proxy beat market-only? | No |
-| Do cancellation and replenishment add stable value? | No |
-| Is the effect stable by day? | No, one day materially influences the buy side |
-| Does the local null confirm sequence structure? | No |
-| Is the pipeline reproducible? | Yes |
+| Side | Static market-only | Static P3 | Dynamic shock absorption |
+|---|---:|---:|---:|
+| buy | -2.4431 bps | -1.7760 bps | -10.3845 bps |
+| sell | -1.7864 bps | -1.5306 bps | -11.2888 bps |
 
-## Research Discipline
-
-The project rejects a stronger composite-signal hypothesis instead of tuning until it appears successful. The result is framed as a disciplined validation study: useful adverse ordering appears in selected regimes, while the broader incremental proxy claim remains unsupported.
+The result is framed carefully: dynamic state ordering is informative, while linear predictive R2 remains small and exact real fills are not observed.
 
 ## Technical Signal
 
-- High-frequency data engineering.
-- Time-aware feature construction.
-- Leakage control.
-- Model comparison.
-- Null testing.
-- Regime analysis.
-- Reproducibility.
-- Mechanism interpretation.
+- High-frequency data engineering and Parquet-based processing.
+- Market-microstructure label design.
+- Side-aware sign conventions.
+- Timestamp-aware future response construction.
+- Mechanism testing under chronological validation.
+- Null-model design and negative-result discipline.
+- Compact, reproducible research packaging.
 
 ## Evidence Boundary
 
-Real data validates quote-consumption conditions, not exact FIFO fills.
+The real BTC dataset supports quote-pressure and visible-depth validation, not exact FIFO queue reconstruction. The project makes no claim of live trading profitability or production execution readiness.
+
+## Next Empirical Step
+
+Run the same labeling and validation logic on single-venue L3/MBO data with order identifiers and exact queue updates.

@@ -1,115 +1,103 @@
 # When Is a Fill Bad?
-## Synthetic Exact Fills and Real BTC Execution-Pressure Validation
+## Fill Likelihood, Quote Pressure, and Post-Quote Markout
 
-**Can market states associated with easier passive execution also produce worse execution quality?**
+**Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?**
 
-In the real BTC sample, execution-pressure proxies produce adverse post-quote ordering at short and intermediate horizons. A richer proxy combining market pressure, cancellation, and replenishment does not robustly outperform market-order pressure alone. The effect is horizon-dependent, day-dependent, and not clearly separated from a local shuffled null.
+This repository studies the distinction between execution likelihood and execution quality. The synthetic layer provides exact hypothetical passive fills and signed post-fill markouts. The real Coinbase BTC layer cannot observe FIFO fills, so it validates the same mechanism through quote-pressure episodes, visible-depth penetration, post-shock absorption, best-quote survival, and future side-adjusted markout.
 
-The real-data layer uses execution pressure as a proxy because exact FIFO fills are not observed in the one-second aggregated dataset.
+The central empirical lesson is restrained: a static composite execution-pressure proxy is not enough. In the real BTC sample, separating the process into **shock -> penetration -> absorption -> quote survival -> markout response** produces a clearer state ranking than market-only or static P3 proxies, but the result remains a proxy study rather than a claim about exact live fills.
 
-![Formation-window by response-horizon map](outputs/figures/real_btc_main/03_formation_response_map.png)
-
-*Execution pressure orders future passive-side markout at short and intermediate horizons, while the relation weakens and reverses at longer horizons.*
+![Dynamic versus static representation](outputs/figures/dynamic_lob_main/05_dynamic_vs_static.png)
 
 ## Evidence Design
 
 ```text
 Synthetic controlled experiment
--> exact hypothetical fills
+-> exact hypothetical passive fills
 -> fill likelihood
--> post-fill markout
+-> post-fill signed markout
 
-Real BTC validation
--> execution-pressure proxy
--> future side-adjusted markout
+Real Coinbase BTC validation
+-> one-second quote-pressure episodes
+-> potential visible-depth penetration
+-> absorption and quote-survival response
+-> future side-adjusted post-quote markout
 ```
 
-## Data
+## Data Boundary
 
 | Item | Value |
 |---|---:|
 | Real dataset | Coinbase BTC |
 | Rows | 1,030,728 |
 | Frequency | ~1 second |
-| Book depth | 15 levels |
+| Visible depth | 15 levels |
 | Date range | 2021-04-07 to 2021-04-19 UTC |
 | Available activity | market / limit / cancel notional |
 | Exact FIFO fills | unavailable |
+| Live trading claim | none |
 
-## Research Components
+The real-data layer uses one-second snapshots and interval aggregates. It supports empirical quote-pressure validation, not order-level queue reconstruction.
 
-- Million-row real LOB data pipeline with schema audit and Parquet conversion.
+## Research System
+
 - Synthetic exact-fill experiment for controlled passive-order replay.
-- Side-adjusted passive-buy and passive-sell markout construction.
-- Execution-pressure proxy family based on market flow, cancellation, replenishment, and displayed depth.
-- Chronological train/validation/test evaluation.
-- Multi-scale response analysis across formation windows and markout horizons.
-- Day-level stability analysis and local shuffled-null test.
-- Reproducible Makefile pipeline with focused tests.
+- Million-row Coinbase BTC data pipeline with schema audit and Parquet conversion.
+- Side-adjusted passive-buy and passive-sell markout conventions.
+- Static execution-pressure baselines: market-only, market + cancellation, and market + cancellation - replenishment.
+- Dynamic shock analysis using 15-level visible depth, potential penetration, absorption, quote survival, and recovery paths.
+- Chronological train/validation/test evaluation, local null tests, and reproducible output tables and figures.
 
-## Evidence Summary
+## Main Result
 
-| Question | Result |
-|---|---|
-| Does execution pressure order future markout? | Partly, at short/intermediate horizons |
-| Does full proxy beat market-only? | No |
-| Do cancellation and replenishment add stable value? | No |
-| Is the effect stable by day? | No, one day materially influences the buy side |
-| Does the local null confirm sequence structure? | No |
-| Is the pipeline reproducible? | Yes |
+The first real-data proxy test found that richer static pressure signals did not reliably outperform market-order pressure alone. That negative result motivated a narrower dynamic audit: condition on large quote-pressure shocks, then measure whether the visible book absorbs or fails to absorb the shock.
 
-Supported:
+On the untouched test period, the dynamic multi-level shock-absorption representation produces substantially more adverse high-minus-low markout ordering than the static baselines:
 
-- complete and reproducible real BTC proxy pipeline;
-- short/intermediate adverse ordering in selected scales;
-- market-order pressure provides the clearest simple ordering.
+| Side | Representation | High-minus-low 60s markout | Rank correlation |
+|---|---|---:|---:|
+| buy | market-only static | -2.4431 bps | -0.0244 |
+| buy | static P3 proxy | -1.7760 bps | -0.0148 |
+| buy | multi-level shock absorption | -10.3845 bps | -0.2416 |
+| sell | market-only static | -1.7864 bps | -0.0406 |
+| sell | static P3 proxy | -1.5306 bps | +0.0056 |
+| sell | multi-level shock absorption | -11.2888 bps | -0.2915 |
 
-Partially supported:
+Absorption states are economically interpretable. Weak absorption has negative 60s markout and low quote survival; strong absorption has positive 60s markout and materially higher quote survival.
 
-- full execution pressure carries information in selected regimes;
-- the effect is stronger on specific days and horizons.
+## Null Result And Boundary
 
-Unsupported:
-
-- cancellation and replenishment add stable incremental value;
-- the full proxy robustly beats market-only;
-- the local sequence mechanism is confirmed by the shuffled null;
-- the effect is stable across all days and horizons.
-
-## Interpretation
-
-The project shows how a plausible richer execution-pressure signal can fail to improve on a simpler baseline once chronological validation, horizon analysis, daily stability, and null tests are applied. That negative-result discipline is central to the research value: the pipeline preserves the mechanism hypothesis while making the evidence boundary explicit.
+A stratified local null preserves date, side, and potential penetration class while shuffling markout alignment. The dynamic representation remains more adverse than the null average in both directions, but linear projection R2 remains small. The result is best read as **state ordering and mechanism diagnostics**, not as a high-accuracy return prediction model.
 
 ## Reproduction
 
 ```bash
-make real-btc-validation
+make dynamic-lob
 python -m pytest tests
 ```
 
-Synthetic validation remains available:
+Earlier validation layers remain available:
 
 ```bash
+make real-btc-validation
 make reproduce
 ```
 
 ## Limitations
 
-- Exact real fills are unavailable.
+- Exact real passive fills and FIFO queue position are unavailable.
 - One-second aggregation removes intrasecond event order.
-- The sample covers one venue and one short period.
-- `2021-04-18` materially influences the buy-side aggregate.
-- Null results limit sequence-mechanism claims.
-- No live trading or profitability claim.
+- Potential penetration is measured against visible depth, not actual hidden liquidity or order IDs.
+- The sample covers one venue and a short date range.
+- Linear predictive R2 is small even when dynamic state ordering is clear.
+- No live trading, market-making, or profitability claim is made.
 
-## How To Review This Project
+## Review Path
 
-30 seconds: README summary and hero figure.
+30 seconds: README figure and result table.
 
 3 minutes: [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md).
 
 15 minutes: [RESEARCH_NOTE.md](RESEARCH_NOTE.md).
 
-Code: `src/fillbad/`.
-
-Full methodology and results: [RESEARCH_NOTE.md](RESEARCH_NOTE.md)
+Code: `src/fillbad/`, `scripts/run_dynamic_lob_analysis.py`, and `tests/test_dynamic_lob.py`.

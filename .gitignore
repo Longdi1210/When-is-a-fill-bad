@@ -10,3 +10,4 @@ data/raw/
 data/processed/kaggle_btc/
 data/processed/kaggle_btc_canonical.parquet
 data/processed/kaggle_btc_canonical.csv
+data/processed/real_btc_shock_episodes.parquet

@@ -2,28 +2,19 @@
 
 ## 1. Research Question
 
-Can market states associated with easier passive execution also produce worse execution quality?
+Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?
 
-## 2. Why Fill Likelihood And Execution Quality Differ
+The project treats this as an execution-quality question, not as a generic return-forecasting task. Execution likelihood and execution quality are different objects: a quote can become easier to hit precisely when visible liquidity is being consumed or withdrawn.
 
-Fill likelihood asks whether a passive quote executes. Execution quality asks what happens after execution. A passive order can be easier to fill precisely when liquidity is being consumed or withdrawn, which may make the subsequent price response adverse.
+## 2. Evidence Design
 
-## 3. Two-Layer Evidence Design
+The repository has two evidence layers.
 
-The project has two layers:
+The synthetic layer provides exact hypothetical passive fills, time-to-fill, censoring, and signed post-fill markout. It validates the label design and side convention in a controlled setting.
 
-- synthetic controlled data: exact hypothetical fills, fill likelihood, post-fill signed markout;
-- real Coinbase BTC data: passive-side execution-pressure proxy, future side-adjusted post-quote markout.
+The real Coinbase BTC layer does not contain exact FIFO fills. It therefore uses execution-pressure and shock-response proxies: large market-order pressure against the passive side, potential penetration through displayed depth, post-shock replenishment or cancellation, best-quote survival, and future side-adjusted markout.
 
-The real-data layer validates mechanism conditions. It is not an exact real-fill study.
-
-## 4. Synthetic Exact-Fill Experiment
-
-The synthetic experiment submits passive buy and sell orders at the best bid and best ask. It constructs fill labels, time-to-fill, censoring, and signed post-fill markouts. It remains the exact-fill validation layer.
-
-The synthetic result supports the core distinction between fill likelihood and markout, but the richer flow-depletion interaction is weak and unstable.
-
-## 5. Real BTC Data And Provenance
+## 3. Data Provenance
 
 | Item | Value |
 |---|---:|
@@ -34,13 +25,22 @@ The synthetic result supports the core distinction between fill likelihood and m
 | Activity fields | market, limit, cancel notional |
 | Data type | mixed snapshot + one-second interval aggregates |
 
-Unsupported: exact FIFO queue position, exact passive fills, hidden liquidity, and intrasecond event ordering.
+Unsupported by this dataset: exact FIFO queue position, exact passive fills, hidden liquidity, partial fills, and intrasecond event ordering.
 
-## 6. Passive-Side Execution-Pressure Proxies
+## 4. Side-Adjusted Markout
 
-Each valid timestamp creates two observations: passive buy at the best bid and passive sell at the best ask.
+For both synthetic fills and real post-quote outcomes, positive markout is favorable to the passive trader.
 
-For passive buys, pressure uses market sells, bid cancellation, bid limit replenishment, and visible bid depth. For passive sells, pressure uses market buys, ask cancellation, ask limit replenishment, and visible ask depth.
+```text
+buy markout  =  10^4 log(mid_{t+H} / mid_t)
+sell markout = -10^4 log(mid_{t+H} / mid_t)
+```
+
+Future labels use timestamp-aware joins with tolerance checks rather than row shifts across possible time gaps.
+
+## 5. Static Proxy Baseline
+
+The first real-data validation used static execution-pressure proxies:
 
 ```text
 P1 = market pressure / visible passive depth
@@ -48,34 +48,7 @@ P2 = (market pressure + same-side cancellation) / visible passive depth
 P3 = (market pressure + same-side cancellation - same-side replenishment) / visible passive depth
 ```
 
-## 7. Side-Adjusted Markout
-
-Markout is measured in basis points. Positive is favorable for the passive trader; negative is adverse.
-
-```text
-buy markout  =  10^4 log(mid_{t+H} / mid_t)
-sell markout = -10^4 log(mid_{t+H} / mid_t)
-```
-
-Future labels use timestamp-aware joins rather than row offsets.
-
-## 8. Chronological Split
-
-| Split | Dates |
-|---|---|
-| train | 2021-04-07 to 2021-04-13 |
-| validation | 2021-04-14 to 2021-04-16 |
-| test | 2021-04-17 to 2021-04-19 |
-
-Formation windows: `[1, 2, 5, 10, 30, 60]` seconds.
-
-Markout horizons: `[1, 5, 10, 30, 60, 300]` seconds.
-
-The display configuration selected from train/validation is `W=10s, H=60s`.
-
-## 9. Main Result
-
-At `W=10s, H=60s` on the untouched test set:
+At `W=10s, H=60s` on the chronological test set:
 
 | Proxy | High-minus-low markout |
 |---|---:|
@@ -83,93 +56,115 @@ At `W=10s, H=60s` on the untouched test set:
 | P2 market + cancel | +1.2222 bps |
 | P3 full depth-normalized | -0.8872 bps |
 
-Execution pressure shows adverse ordering in selected short/intermediate-horizon configurations, but the richer proxy does not robustly beat the simpler market-only signal.
+The static result is weak. Cancellation and replenishment do not add stable out-of-sample value, and the local shuffled null is close to the real sequence. This is retained as a useful falsification: a plausible composite pressure score is not automatically a better execution-quality signal.
 
-## 10. Market-Only Versus Richer Proxies
+## 6. Dynamic Shock-Absorption Analysis
 
-At `W=10s, H=60s`:
+The dynamic layer separates the sequence into:
 
-| Quantity | Value |
+```text
+shock -> potential visible-depth penetration -> absorption -> quote survival -> markout response
+```
+
+Shock episodes are selected using train-period 95th percentile thresholds of 10-second market pressure relative to lagged top-5 displayed depth. The same thresholds are then applied chronologically.
+
+| Metric | Value |
 |---|---:|
-| Cancellation increment R2 | +0.000160 |
-| Replenishment increment R2 | -0.000268 |
-| Full proxy vs controls R2 | -0.000649 |
-| Market-only rank correlation | +0.089046 |
-| Full-proxy rank correlation | +0.085100 |
+| Shock episodes | 22,372 |
+| Train episodes | 10,745 |
+| Validation episodes | 6,747 |
+| Test episodes | 4,880 |
+| Formation window | 10 seconds |
+| Response horizons | 1, 2, 5, 10, 30, 60, 120, 300 seconds |
 
-P2 changes sign relative to P3, and P3 remains adverse. However, the richer proxy does not improve the model metrics.
+Absorption combines post-shock net replenishment, top-5 depth recovery, and best-quote survival. This is not a pre-trade alpha signal; it is a state-response diagnostic after a quote-pressure shock.
 
-## 11. Formation-Window By Response-Horizon Result
+## 7. Dynamic Versus Static Result
 
-P3 test high-minus-low markout:
+On the untouched test period, multi-level shock absorption produces a much clearer adverse state ordering than the static baselines:
 
-| H \\ W | 1 | 2 | 5 | 10 | 30 | 60 |
-|---:|---:|---:|---:|---:|---:|---:|
-| 1s | -0.1681 | -0.1417 | -0.0964 | -0.0803 | -0.0422 | -0.0472 |
-| 5s | -0.2615 | -0.2179 | -0.1763 | -0.1718 | -0.1336 | -0.1731 |
-| 10s | -0.2870 | -0.2558 | -0.2489 | -0.2659 | -0.2314 | -0.3360 |
-| 30s | -0.4948 | -0.4398 | -0.4928 | -0.5880 | -0.5909 | -1.0367 |
-| 60s | -0.6576 | -0.6016 | -0.6878 | -0.8872 | -1.1081 | -2.1007 |
-| 300s | -0.3484 | -0.2178 | -0.2614 | +0.0503 | +1.2142 | +2.0954 |
+| Side | Representation | High-minus-low 60s markout | Rank correlation |
+|---|---|---:|---:|
+| buy | market-only static | -2.4431 bps | -0.0244 |
+| buy | static P3 proxy | -1.7760 bps | -0.0148 |
+| buy | top-level dynamic | -1.3574 bps | +0.0005 |
+| buy | multi-level shock absorption | -10.3845 bps | -0.2416 |
+| sell | market-only static | -1.7864 bps | -0.0406 |
+| sell | static P3 proxy | -1.5306 bps | +0.0056 |
+| sell | top-level dynamic | -0.0308 bps | -0.0298 |
+| sell | multi-level shock absorption | -11.2888 bps | -0.2915 |
 
-## 12. 300-Second Dissipation And Reversal
+The important change is not model complexity. It is the representation: large pressure by itself is less informative than pressure conditioned on visible-depth penetration and subsequent absorption failure.
 
-The adverse ordering is strongest at short and intermediate horizons. It dissipates and reverses at 300 seconds for longer formation windows. This is a horizon-dependent result; it should not be labeled mean reversion without a separate test.
+## 8. Absorption States
 
-## 13. Daily Stability And 2021-04-18 Concentration
+At the 60-second response horizon:
 
-| Date | Side | High-minus-low markout |
-|---|---|---:|
-| 2021-04-17 | buy | -0.0351 |
-| 2021-04-18 | buy | -5.5869 |
-| 2021-04-19 | buy | +0.0834 |
-| 2021-04-17 | sell | +0.7801 |
-| 2021-04-18 | sell | -1.2803 |
-| 2021-04-19 | sell | -0.5667 |
+| Side | Absorption state | Count | Mean markout | Quote survival |
+|---|---|---:|---:|---:|
+| buy | weak absorption | 3,293 | -6.7425 bps | 0.1971 |
+| buy | partial absorption | 3,822 | -0.8327 bps | 0.4611 |
+| buy | strong absorption | 3,899 | +3.1792 bps | 0.6516 |
+| sell | weak absorption | 4,139 | -6.3097 bps | 0.1858 |
+| sell | partial absorption | 3,720 | -0.3576 bps | 0.4739 |
+| sell | strong absorption | 3,499 | +3.4253 bps | 0.6424 |
 
-The aggregate buy-side result is materially influenced by 2021-04-18.
+Weak absorption corresponds to poor passive-side markout and low quote survival on both sides. Strong absorption corresponds to favorable markout and higher quote survival.
 
-## 14. Local Shuffled-Null Result
+## 9. Local Projection Boundary
 
-| Null statistic | Value |
-|---|---:|
-| Mean real-minus-shuffle | +0.1756 bps |
-| Median real-minus-shuffle | -0.0542 bps |
-| Share real more adverse | 56.94% |
-| Mean real | -0.2914 bps |
-| Mean shuffled | -0.4669 bps |
+Linear projections using shock ratio, absorption score, interaction, spread, depth, and recent volatility have small R2 even when rank ordering is meaningful.
 
-The local null does not support a strong sequence-specific mechanism.
+At 60 seconds:
 
-## 15. Supported Findings
+| Side | R2 | MAE | Rank correlation |
+|---|---:|---:|---:|
+| buy | 0.0024 | 12.2267 bps | 0.3288 |
+| sell | 0.0035 | 11.8599 bps | 0.3428 |
 
-- The real BTC pipeline is complete and reproducible.
-- Side-adjusted post-quote markouts are timestamp-aware.
-- Short/intermediate adverse ordering appears in selected configurations.
-- Market-order pressure gives the clearest simple ordering.
+This is a useful boundary. The dynamic representation orders states; it does not create a high-accuracy predictive model.
 
-## 16. Partially Supported Findings
+## 10. Stratified Null
 
-- Full execution pressure carries information in selected regimes.
-- The effect is stronger for specific days and horizons.
-- Cancellation and replenishment help diagnose regimes, but not as stable performance improvements.
+The local null preserves date, side, and potential penetration class while shuffling markout alignment. This disrupts the link between absorption path and future markout without globally reshuffling the market.
 
-## 17. Unsupported Findings
+| Side | Representation | Real high-minus-low | Null mean high-minus-low |
+|---|---|---:|---:|
+| buy | multi-level shock absorption | -10.3845 bps | -1.0732 bps |
+| sell | multi-level shock absorption | -11.2888 bps | -3.1358 bps |
 
-- The full proxy robustly beats market-only.
-- Cancellation and replenishment add stable incremental value.
-- The local shuffled null confirms a local sequence mechanism.
-- The effect is stable across all days and horizons.
-- Real data provide exact passive fill probabilities.
+The null comparison supports the value of the dynamic absorption state, while the short sample and small linear R2 prevent a stronger live-trading claim.
 
-## 18. Limitations
+## 11. Supported Findings
 
-- One-second aggregation removes intrasecond ordering.
-- Exact FIFO fills are unavailable.
-- The sample covers one venue and a short date range.
-- Hidden liquidity, fees, latency, and partial fills are not modeled.
-- No live trading or profitability claim is made.
+- The repository implements reproducible synthetic exact-fill labels and real BTC post-quote validation.
+- Static market/cancel/replenishment proxies are insufficient as a standalone mechanism.
+- Dynamic decomposition into shock, penetration, absorption, and quote survival produces clearer adverse markout ordering.
+- Weak absorption states have negative markout and low quote survival on both passive sides.
+- The dynamic state ordering is stronger than the stratified local null average.
 
-## 19. What Exact L3 Data Would Be Required Next
+## 12. Unsupported Or Bounded Findings
 
-The next empirical step would require single-venue order-level L3/MBO data with order identifiers, trades, cancellations, queue updates, and sufficiently precise timestamps. That would allow exact passive fill analysis rather than proxy validation.
+- Exact real passive fill probability is not observed.
+- The static P3 proxy does not robustly outperform market-only pressure.
+- Linear models have small R2, so the result should not be presented as a high-accuracy return forecast.
+- One venue and one short sample do not establish a universal market law.
+- No trading profitability, optimal execution, or market-making claim is made.
+
+## 13. Reproduction
+
+```bash
+make dynamic-lob
+python -m pytest tests
+```
+
+Earlier layers:
+
+```bash
+make real-btc-validation
+make reproduce
+```
+
+## 14. Next Empirical Step
+
+The natural extension is single-venue L3/MBO data with order identifiers, trades, cancellations, and precise queue updates. That would allow exact passive fill reconstruction instead of the current one-second quote-pressure proxy.

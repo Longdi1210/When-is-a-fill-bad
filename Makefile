@@ -24,3 +24,8 @@ real-btc-features:
 
 real-btc-validation:
 	PYTHONPATH=src python3 scripts/run_real_btc_validation.py
+
+.PHONY: dynamic-lob
+
+dynamic-lob:
+	PYTHONPATH=src python3 scripts/run_dynamic_lob_analysis.py
