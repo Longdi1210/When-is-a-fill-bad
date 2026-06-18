@@ -1,0 +1,157 @@
+column_name,dtype,non_null_count,unique_count,minimum,maximum,mean,standard_deviation,suspected_group,suspected_level,suspected_side,suspected_event_type,interpretation_confidence,notes
+Unnamed: 0,int64,1030728,1030728,0.0,1030727.0,515363.5,297545.54413050227,derived_fields,,,,high,CSV row index exported as a column.
+system_time,object,1030728,1030728,,,,,timestamp,,,,verified,UTC timestamp string in the CSV.
+midpoint,float64,1030728,320620,51978.18,64896.745,59975.070200736765,2490.0475863091915,derived_fields,,,,verified,Provided midpoint/spread field.
+spread,float64,1030728,4449,0.01,1245.1,1.3140331202800355,4.713293188977802,derived_fields,,,,verified,Provided midpoint/spread field.
+buys,float64,1030728,741251,0.0,4060005.1483136863,6060.057858883872,32348.169904902414,market-order activity,,buy,market,medium,Aggregate buy/sell activity over the one-second interval.
+sells,float64,1030728,439441,0.0,5215817.000898426,5278.900158422283,35807.55319720506,market-order activity,,sell,market,medium,Aggregate buy/sell activity over the one-second interval.
+bids_distance_0,float64,1030728,346398,-0.0111718401312828,-7.704546334252883e-08,-1.1123296179447799e-05,4.152572246243469e-05,bid prices,0.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_1,float64,1030728,582253,-0.0112211890518665,-2.314625362487277e-07,-4.748917794554154e-05,6.664104107508112e-05,bid prices,1.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_2,float64,1030728,681866,-0.0112219071015715,-3.8665044144181593e-07,-7.813118480072922e-05,7.98530253588551e-05,bid prices,2.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_3,float64,1030728,703530,-0.0112287262454628,-5.436147034743044e-07,-0.00010411339352670991,9.147519989090994e-05,bid prices,3.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_4,float64,1030728,726369,-0.0112289059907197,-7.03674231772311e-07,-0.00012845435294675975,0.00010149420985404488,bid prices,4.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_5,float64,1030728,743842,-0.0112344687804579,-8.707652341399807e-07,-0.0001509768546100878,0.00011065120977191073,bid prices,5.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_6,float64,1030728,755877,-0.011240211315453,-1.0418572173875873e-06,-0.00017220426536842932,0.00011921227837487724,bid prices,6.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_7,float64,1030728,763198,-0.0112448772415518,-1.4889255908201449e-06,-0.0001926195830237211,0.00012652971829371233,bid prices,7.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_8,float64,1030728,767563,-0.0112522346898913,-1.8392603351458088e-06,-0.00021241031936823027,0.0001332689701817762,bid prices,8.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_9,float64,1030728,768942,-0.0113042760640382,-2.3647633042855887e-06,-0.00023180631792637266,0.00013991675420043154,bid prices,9.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_10,float64,1030728,767770,-0.0113670844584703,-2.5399319838470547e-06,-0.0002510240696272095,0.00014606207535796816,bid prices,10.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_11,float64,1030728,766362,-0.0113728269934654,-2.715099526540143e-06,-0.00027029117231316876,0.00015263507463997828,bid prices,11.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_12,float64,1030728,763283,-0.0113816205412149,-3.0654339298052946e-06,-0.00028961770727979814,0.00015883779013858666,bid prices,12.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_13,float64,1030728,759791,-0.0114410193637013,-3.415769242565148e-06,-0.00030918448742992764,0.00016513872606364698,bid prices,13.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_distance_14,float64,1030728,755257,-0.0114548373967409,-4.116437139600748e-06,-0.00032904852143871997,0.00017140396282778548,bid prices,14.0,bid,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+bids_notional_0,float64,1030728,697117,-0.0,6450667.0,77727.73134454445,154245.56154142015,bid sizes,0.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_1,float64,1030728,424070,0.0,5326647.5,18755.056272091937,46244.44030364211,bid sizes,1.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_2,float64,1030728,471207,0.0,6818384.0,22598.626554815844,54726.25798233334,bid sizes,2.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_3,float64,1030728,436356,0.0,6823570.0,21918.58428555788,60287.96677141216,bid sizes,3.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_4,float64,1030728,432190,0.0,6823570.0,21372.98395992381,51174.60463832165,bid sizes,4.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_5,float64,1030728,433424,0.0,6823570.0,20828.978438340913,48579.266221811864,bid sizes,5.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_6,float64,1030728,434805,0.0,6823570.0,20278.145750797594,49296.88730897965,bid sizes,6.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_7,float64,1030728,435601,0.0,6818971.0,19808.722803958848,47777.81235212631,bid sizes,7.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_8,float64,1030728,435993,0.0,6818971.0,19480.897372073017,47827.61396419505,bid sizes,8.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_9,float64,1030728,436079,0.0,6823570.0,19212.975004453987,47300.545260251085,bid sizes,9.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_10,float64,1030728,435061,0.0,6823570.0,19043.753387596087,46362.85035633753,bid sizes,10.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_11,float64,1030728,433788,0.0,6823520.0,18831.231203456195,42170.957287222336,bid sizes,11.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_12,float64,1030728,431851,0.0,6823570.0,19010.028035704803,43110.09188944996,bid sizes,12.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_13,float64,1030728,429443,0.0,6823570.0,19114.918324997405,40939.49653240972,bid sizes,13.0,bid,snapshot,high,Visible notional at this book level.
+bids_notional_14,float64,1030728,426118,0.0,6823520.0,19286.449526102828,42436.500944882006,bid sizes,14.0,bid,snapshot,high,Visible notional at this book level.
+bids_cancel_notional_0,float64,1030728,436928,0.0,12622370.0,49065.231365875305,117641.48317950444,cancellation activity,0.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_1,float64,1030728,87734,0.0,4448010.0,4700.987169761714,32886.911590520154,cancellation activity,1.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_2,float64,1030728,80389,0.0,4962207.0,4088.532088715135,31188.556144443413,cancellation activity,2.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_3,float64,1030728,69384,0.0,3060653.0,3500.6267100681766,28083.48953088001,cancellation activity,3.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_4,float64,1030728,56408,0.0,4469364.5,2909.986806308137,26607.91121435714,cancellation activity,4.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_5,float64,1030728,47143,0.0,2135349.75,2514.348204165081,23604.85472882501,cancellation activity,5.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_6,float64,1030728,40661,0.0,7265629.0,2249.2714961188603,23326.97365205436,cancellation activity,6.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_7,float64,1030728,35984,0.0,2743000.25,2004.8468662416406,21369.390092195357,cancellation activity,7.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_8,float64,1030728,31603,0.0,3626512.75,1752.3142817222836,20157.492264566707,cancellation activity,8.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_9,float64,1030728,28032,0.0,4587624.5,1571.5632618637956,19404.411809596833,cancellation activity,9.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_10,float64,1030728,25347,0.0,3679867.75,1394.676612184117,18214.248497902357,cancellation activity,10.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_11,float64,1030728,22461,0.0,2913879.25,1206.5626808425393,17200.012230210737,cancellation activity,11.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_12,float64,1030728,20371,0.0,4167000.0,1078.5393233554178,16500.529775005303,cancellation activity,12.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_13,float64,1030728,18062,0.0,1984082.125,902.3129872539379,14601.289498670461,cancellation activity,13.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_cancel_notional_14,float64,1030728,16448,0.0,9315180.0,805.3080766049954,18193.579367106624,cancellation activity,14.0,bid,cancel,medium,One-second cancellation notional at this side/level.
+bids_limit_notional_0,float64,1030728,635475,0.0,12793746.0,69220.59064641173,135365.90328964614,limit-order activity,0.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_1,float64,1030728,378495,0.0,4698541.5,13076.366309746198,41577.36534299853,limit-order activity,1.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_2,float64,1030728,394549,0.0,5877404.5,14601.852687074377,42567.08314854371,limit-order activity,2.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_3,float64,1030728,332669,0.0,3146556.0,12356.632431801172,39925.95193820287,limit-order activity,3.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_4,float64,1030728,304523,0.0,4506283.5,10850.07030891559,37873.124455140525,limit-order activity,4.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_5,float64,1030728,288643,0.0,3024352.0,9483.462857881372,33138.99621719121,limit-order activity,5.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_6,float64,1030728,276709,0.0,6854505.5,8423.813419248256,30998.353093918005,limit-order activity,6.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_7,float64,1030728,267132,0.0,2972612.75,7510.213041250749,27443.908593013406,limit-order activity,7.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_8,float64,1030728,258977,0.0,3617764.5,6779.9048648302905,24981.426628416873,limit-order activity,8.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_9,float64,1030728,251509,0.0,4587624.5,6281.301308124048,23488.72907675547,limit-order activity,9.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_10,float64,1030728,244259,0.0,3662034.5,5916.1754170389495,24171.770324289522,limit-order activity,10.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_11,float64,1030728,236535,0.0,3611532.5,5508.23708198996,20359.28065941656,limit-order activity,11.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_12,float64,1030728,228186,0.0,4167434.5,5237.701094951772,19433.827427026335,limit-order activity,12.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_13,float64,1030728,220368,0.0,2101250.75,5029.382953090663,17807.884956907088,limit-order activity,13.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_limit_notional_14,float64,1030728,212976,0.0,9426346.0,4881.954881305801,22115.063683691995,limit-order activity,14.0,bid,limit,medium,One-second limit-order notional at this side/level.
+bids_market_notional_0,float64,1030728,146004,0.0,2597331.75,991.8101470353357,12331.085518662572,market-order activity,0.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_1,float64,1030728,17236,0.0,1001148.9375,75.75711942309941,2388.0928846680217,market-order activity,1.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_2,float64,1030728,11327,0.0,520284.34375,59.75006776842719,1999.5641472165894,market-order activity,2.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_3,float64,1030728,7887,0.0,1148781.75,41.4648202649262,1808.7936244688551,market-order activity,3.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_4,float64,1030728,5749,0.0,389812.0625,36.38672661046003,1563.3446146315173,market-order activity,4.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_5,float64,1030728,4363,0.0,1145348.0,27.586296839866417,1817.232267268793,market-order activity,5.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_6,float64,1030728,3314,0.0,654897.875,20.741583491120274,1343.5111431146056,market-order activity,6.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_7,float64,1030728,2489,0.0,494918.09375,17.728543220950197,1200.734966485575,market-order activity,7.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_8,float64,1030728,1873,0.0,956521.6875,13.630909404388122,1354.6135736700683,market-order activity,8.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_9,float64,1030728,1428,0.0,679599.9375,8.832402786652597,1058.9101843596118,market-order activity,9.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_10,float64,1030728,1109,0.0,183219.34375,6.815590771123894,576.6027557812137,market-order activity,10.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_11,float64,1030728,840,0.0,440604.3125,5.742055552142539,668.3472646393312,market-order activity,11.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_12,float64,1030728,641,0.0,149044.8125,3.7141272751043477,432.23772161999057,market-order activity,12.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_13,float64,1030728,462,0.0,130631.6328125,2.9421717031620096,396.6872691143649,market-order activity,13.0,bid,market,medium,One-second market-order notional consuming this side/level.
+bids_market_notional_14,float64,1030728,345,0.0,58769.30078125,1.379585006947506,187.93742281366158,market-order activity,14.0,bid,market,medium,One-second market-order notional consuming this side/level.
+asks_distance_0,float64,1030728,346398,7.704546334252883e-08,0.0111718401312828,1.1123296179459297e-05,4.152572246246808e-05,ask prices,0.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_1,float64,1030728,577116,2.313432219125389e-07,0.0153465727344155,4.443485917410929e-05,7.08221750631766e-05,ask prices,1.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_2,float64,1030728,665347,3.863695212658058e-07,0.0153469378128647,7.246570188942191e-05,8.452063309306439e-05,ask prices,2.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_3,float64,1030728,683237,5.425008566817269e-07,0.0153588037937879,9.621261978838897e-05,9.628589882959259e-05,ask prices,3.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_4,float64,1030728,704142,6.975033102207817e-07,0.0157653335481882,0.00011803451195767935,0.00010769122275965737,ask prices,4.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_5,float64,1030728,719231,8.525040016138519e-07,0.0158345196396112,0.00013809758300323868,0.00011639536350155547,ask prices,5.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_6,float64,1030728,729554,1.007504693006922e-06,0.0158434640616178,0.00015715042193218355,0.00012523710254188977,ask prices,6.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_7,float64,1030728,737264,1.162505441243411e-06,0.0158909261226654,0.00017559126973743845,0.00013390674788727982,ask prices,7.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_8,float64,1030728,740959,1.3175061894799e-06,0.0178546998649835,0.00019354022774475369,0.00014221007717010959,ask prices,8.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_9,float64,1030728,743532,1.472506937716389e-06,0.0183296222239732,0.00021121854043417145,0.00015083507301832334,ask prices,9.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_10,float64,1030728,744048,1.6492649592692032e-06,0.0201447810977697,0.00022872821755640937,0.00015970226140530095,ask prices,10.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_11,float64,1030728,744149,1.8063377638100064e-06,0.0224686972796916,0.0002461693880995192,0.0001673157818500645,ask prices,11.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_12,float64,1030728,742850,3.861223831336247e-06,0.0224688779562711,0.00026352488889224974,0.00017476685623269716,ask prices,12.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_13,float64,1030728,741590,4.018824711238267e-06,0.0227603036910295,0.0002809207381104771,0.00018345031359877196,ask prices,13.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_distance_14,float64,1030728,740100,1.0266545359627344e-05,0.0229206588119268,0.0002983857320431486,0.00019327672007547105,ask prices,14.0,ask,snapshot,high,Relative distance from midpoint; price is inferred as midpoint * (1 + distance).
+asks_notional_0,float64,1030728,783578,-0.0,12591786.0,82244.5041447351,171753.2425801724,ask sizes,0.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_1,float64,1030728,430294,0.0,9651121.0,23011.323575144146,73128.98706964831,ask sizes,1.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_2,float64,1030728,453402,0.0,9607760.0,23729.83982784694,64012.94577069031,ask sizes,2.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_3,float64,1030728,417728,0.0,9608681.0,22274.608551826095,66001.86270771931,ask sizes,3.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_4,float64,1030728,413086,0.0,8499461.0,21472.503299732874,57030.270903272765,ask sizes,4.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_5,float64,1030728,412958,0.0,9607760.0,20994.36400416371,60960.31195451369,ask sizes,5.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_6,float64,1030728,413132,0.0,9607760.0,20166.915835657965,52793.470526427394,ask sizes,6.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_7,float64,1030728,412996,0.0,8114975.5,19484.569452204283,50496.23730451746,ask sizes,7.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_8,float64,1030728,412565,0.0,9257822.0,18930.707452653165,46785.795644814025,ask sizes,8.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_9,float64,1030728,412323,0.0,8378139.0,18503.56523626619,47776.0607566745,ask sizes,9.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_10,float64,1030728,411206,0.0,8352603.0,18233.651782047687,44407.94973215824,ask sizes,10.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_11,float64,1030728,409596,0.0,8723536.0,18041.16780669973,43903.116789495056,ask sizes,11.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_12,float64,1030728,408512,0.0,9587031.0,18013.795608983793,44431.98088584238,ask sizes,12.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_13,float64,1030728,406899,0.0,9587031.0,18266.940943878446,49022.05632296977,ask sizes,13.0,ask,snapshot,high,Visible notional at this book level.
+asks_notional_14,float64,1030728,405637,0.0,5398165.5,18336.109782907453,45242.71590587122,ask sizes,14.0,ask,snapshot,high,Visible notional at this book level.
+asks_cancel_notional_0,float64,1030728,388213,0.0,14513090.0,43579.498325906025,112031.27465136872,cancellation activity,0.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_1,float64,1030728,72904,0.0,28265152.0,4151.985194855052,48828.755861740596,cancellation activity,1.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_2,float64,1030728,64576,0.0,9184359.0,3392.2316530661205,31475.300566181082,cancellation activity,2.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_3,float64,1030728,57644,0.0,12490634.0,3059.311466034249,31368.533173952834,cancellation activity,3.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_4,float64,1030728,47681,0.0,6465438.5,2636.9693787280407,24648.45383131957,cancellation activity,4.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_5,float64,1030728,40002,0.0,8988976.0,2361.9500429305676,25721.405102900477,cancellation activity,5.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_6,float64,1030728,35016,0.0,13005086.0,2096.5432010460104,24960.027475779807,cancellation activity,6.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_7,float64,1030728,30251,0.0,2175467.75,1825.6143243353426,20527.357521227466,cancellation activity,7.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_8,float64,1030728,27090,0.0,5150238.0,1624.154307517559,19318.146651304924,cancellation activity,8.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_9,float64,1030728,24278,0.0,2087532.625,1474.3519018828597,17791.91328700604,cancellation activity,9.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_10,float64,1030728,21778,0.0,23377682.0,1328.3886348796061,29270.332910471203,cancellation activity,10.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_11,float64,1030728,19160,0.0,5147055.0,1128.457723713608,16198.921787083047,cancellation activity,11.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_12,float64,1030728,17446,0.0,2355042.25,1001.2282928539413,15074.392235880483,cancellation activity,12.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_13,float64,1030728,16114,0.0,2079439.5,861.1481526091434,13564.513782039056,cancellation activity,13.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_cancel_notional_14,float64,1030728,15078,0.0,2252749.75,781.0533579453078,12872.252072335597,cancellation activity,14.0,ask,cancel,medium,One-second cancellation notional at this side/level.
+asks_limit_notional_0,float64,1030728,617928,0.0,14474508.0,64393.04581472553,130326.48357349054,limit-order activity,0.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_1,float64,1030728,367844,0.0,28325288.0,13714.44027358454,55234.97959122006,limit-order activity,1.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_2,float64,1030728,362830,0.0,10592033.0,14105.598357400062,43627.45472154095,limit-order activity,2.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_3,float64,1030728,302722,0.0,12272708.0,12019.022552393606,41932.26451758491,limit-order activity,3.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_4,float64,1030728,275520,0.0,6465438.5,10467.620497618613,35438.70071515521,limit-order activity,4.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_5,float64,1030728,259969,0.0,11817895.0,9207.3436238309,34953.92142306967,limit-order activity,5.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_6,float64,1030728,248174,0.0,12896443.0,8052.048093350778,32073.155959722924,limit-order activity,6.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_7,float64,1030728,238432,0.0,2182791.0,7089.891556478409,26405.321674148312,limit-order activity,7.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_8,float64,1030728,230204,0.0,2398832.0,6367.439514916553,23751.84119218448,limit-order activity,8.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_9,float64,1030728,223228,0.0,2233093.0,5841.966767638556,21896.010158867546,limit-order activity,9.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_10,float64,1030728,215784,0.0,23411590.0,5477.421507160711,31617.0014095693,limit-order activity,10.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_11,float64,1030728,209310,0.0,4011938.75,5130.045299711631,19698.028366549024,limit-order activity,11.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_12,float64,1030728,202685,0.0,1675511.0,4891.295627954078,18110.713390488432,limit-order activity,12.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_13,float64,1030728,196656,0.0,2147542.75,4671.579051869063,17116.064653687594,limit-order activity,13.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_limit_notional_14,float64,1030728,191239,0.0,2852879.0,4535.095312934841,17059.59193895253,limit-order activity,14.0,ask,limit,medium,One-second limit-order notional at this side/level.
+asks_market_notional_0,float64,1030728,219348,0.0,2839041.5,1579.3993211890333,12623.392499165258,market-order activity,0.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_1,float64,1030728,25465,0.0,464549.53125,94.91736770921028,1841.3613024256413,market-order activity,1.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_2,float64,1030728,15941,0.0,798672.0,64.38933143915587,2049.107522342881,market-order activity,2.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_3,float64,1030728,11287,0.0,546998.3125,50.638725761554426,1571.5105962864661,market-order activity,3.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_4,float64,1030728,8575,0.0,372986.9375,34.19830741999632,1206.2761994341545,market-order activity,4.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_5,float64,1030728,6360,0.0,529291.75,28.99933249740944,1283.4782069558144,market-order activity,5.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_6,float64,1030728,5039,0.0,201351.671875,22.334597935596772,937.34643637779,market-order activity,6.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_7,float64,1030728,3850,0.0,239886.203125,15.474786250102609,745.4356587437111,market-order activity,7.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_8,float64,1030728,3016,0.0,284256.5625,11.874940995803344,736.859516198325,market-order activity,8.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_9,float64,1030728,2352,0.0,1515274.75,11.260700395288467,1605.107030603564,market-order activity,9.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_10,float64,1030728,1841,0.0,257383.9375,7.6552870035939,537.4836592905559,market-order activity,10.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_11,float64,1030728,1427,0.0,347845.4375,7.01659494897835,684.2537294852639,market-order activity,11.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_12,float64,1030728,1103,0.0,184853.34375,4.484934763155016,450.46591959931624,market-order activity,12.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_13,float64,1030728,834,0.0,110804.921875,2.73322603414998,308.40126934817624,market-order activity,13.0,ask,market,medium,One-second market-order notional consuming this side/level.
+asks_market_notional_14,float64,1030728,655,0.0,117461.8828125,2.007459020015251,251.33852060923581,market-order activity,14.0,ask,market,medium,One-second market-order notional consuming this side/level.

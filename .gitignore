@@ -7,4 +7,6 @@ __pycache__/
 venv/
 env/
 data/raw/
-
+data/processed/kaggle_btc/
+data/processed/kaggle_btc_canonical.parquet
+data/processed/kaggle_btc_canonical.csv

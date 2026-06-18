@@ -1,96 +1,105 @@
 # When Is a Fill Bad?
 
-**Can passive-order states with higher fill likelihood produce worse post-fill execution quality?**
+**Can easier passive execution coincide with worse execution quality?**
 
-## Core Idea
+This repository studies that question with two complementary layers: a controlled synthetic exact-fill experiment and a real Coinbase BTC execution-pressure validation using 1,030,728 one-second LOB observations.
 
-Execution likelihood is not execution quality. A passive order may become easier to fill because the queue ahead is being depleted, but the resulting fill can still be economically poor if the post-fill mid-price moves against the passive trader. This project studies that distinction with a controlled event-driven limit-order-book experiment.
+The main real-data result is restrained: higher passive-side execution pressure is associated with more adverse future markout in selected regimes, especially passive-buy states on 2021-04-18, but the effect is not uniformly stable across all days, sides, and horizons.
 
-![Signed post-fill markout by fill score](outputs/figures/main/03_markout_by_fill_score.png)
+**Boundary:** the real BTC data do not contain exact order-level passive fills or FIFO queue position. Execution pressure is used as a proxy for quote-consumption conditions.
 
-## What I Built
+![Pressure quantiles and future markout](outputs/figures/real_btc_main/01_pressure_vs_markout.png)
 
-- Event-driven synthetic LOB experiment.
-- Hypothetical passive-order replay at the best bid and best ask.
+## Evidence Design
+
+| Layer | What it measures | Evidence boundary |
+|---|---|---|
+| Synthetic controlled experiment | exact hypothetical fills, fill likelihood, post-fill signed markout | simulated queue and event assumptions |
+| Real Coinbase BTC validation | passive-side execution pressure, post-quote side-adjusted markout | one-second aggregates, no exact fills |
+
+## What Was Built
+
+- Event-driven synthetic LOB replay with passive buy/sell orders.
 - Fill, censoring, and signed post-fill markout labels.
-- Queue- and flow-conditioned features at submission time.
+- Real BTC schema audit and Parquet conversion.
+- Side-specific passive quote observations for buy and sell sides.
+- Execution-pressure proxies: market pressure, market + cancellation, market + cancellation - replenishment.
+- Timestamp-aware future markout labels.
 - Chronological train/validation/test evaluation.
-- Nested baseline/mechanism model comparison.
-- Leakage checks and local shuffled-null diagnostic.
-- Reproducible figures and tables.
+- Nested model comparison, depth-conditioned analysis, local shuffled null, and daily stability audit.
 
-## Data And Evidence Boundary
+## Key Results
 
-| Item | Current project state |
-|---|---|
-| Data | Controlled synthetic event stream |
-| Exchange | None |
-| Instrument | Simulated |
-| Empirical BTC claim | None |
-| Live profitability claim | None |
+| Quantity | Result |
+|---|---:|
+| Real BTC rows | 1,030,728 |
+| Train period | 2021-04-07 to 2021-04-13 |
+| Validation period | 2021-04-14 to 2021-04-16 |
+| Test period | 2021-04-17 to 2021-04-19 |
+| Selected real-data display scale | W=10s, H=60s |
+| P1 market-only high-minus-low markout | -0.2347 bps |
+| P2 market+cancel high-minus-low markout | +1.2222 bps |
+| P3 full depth-normalized high-minus-low markout | -0.8872 bps |
+| Buy-side P3 contrast | -1.6516 bps |
+| Sell-side P3 contrast | -0.1228 bps |
 
-The synthetic data are used to validate the research pipeline: replay, labels, side conventions, chronological evaluation, and mechanism testing. The current repository does **not** contain empirical Bitcoin results.
+The P2-to-P3 sign reversal is explained by replenishment: cancellation-only sorting is favorable on average, while the negative-replenishment component pulls raw P3 negative. Depth normalization attenuates the raw adverse contrast rather than creating it.
 
-## Main Finding
+## Supported, Partial, Unsupported
 
-The current run supports the core distinction between fill likelihood and execution quality. Predicted fill-score bins have different realized fill rates and different conditional post-fill markouts. The relationship is not monotonic: some easier-fill states have negative markout, while some lower-score states have better markout.
+Supported:
 
-| Quantity | Current evidence |
-|---|---|
-| Hypothetical passive orders | 6428 |
-| Overall fill rate | 0.5708 |
-| Fill-score bin 10 fill rate | 0.8140 |
-| Fill-score bin 10 signed markout | -1.4665 ticks |
-| Fill-score bin 8 fill rate | 0.5039 |
-| Fill-score bin 8 signed markout | +0.7524 ticks |
+- the project cleanly separates execution likelihood from execution quality;
+- real BTC pressure proxies can be constructed from market, cancellation, limit, and depth fields;
+- selected high-pressure regimes have worse side-adjusted future markout.
 
-This is the useful tension: an order can be easier to fill without being a better fill.
+Partially supported:
 
-## Mechanism Test
+- cancellation and replenishment add small incremental information beyond market flow;
+- the adverse proxy result is stronger for passive buys and high-volatility / 2021-04-18 regimes.
 
-The project tests whether local signed-flow persistence and passive-side queue depletion explain fast but adverse fills. The nested comparison is:
+Unsupported:
 
-- M0: controls only;
-- M1: controls + flow persistence;
-- M2: controls + flow persistence + depletion;
-- M3: controls + flow persistence + depletion + interaction.
-
-The interaction result is weak in the current synthetic run. At the best M3 fill-AUC window, W=50, the M3 fill ROC AUC is 0.5261 and M3-M2 AUC is -0.00087. This does not justify a strong mechanism claim. The mechanism remains a disciplined hypothesis test rather than a discovered law.
+- exact real passive fill probability;
+- FIFO queue reconstruction;
+- a universal stable pressure-to-adverse-markout law.
 
 ## Reproduce
 
+The raw CSV is intentionally not committed. Once `data/processed/kaggle_btc_canonical.parquet` exists, run:
+
+```bash
+make real-btc-validation
+python -m pytest tests
+```
+
+To rebuild the real-data audit and canonical table from the local raw CSV:
+
+```bash
+make real-btc
+```
+
+Synthetic validation remains available:
+
 ```bash
 make reproduce
-make test
 ```
 
-Equivalent commands:
+## Main Files
 
-```bash
-python3 scripts/run_main_analysis.py
-PYTHONPATH=src python3 -m unittest discover tests
-```
-
-Outputs:
-
-- `outputs/figures/main/`
-- `outputs/figures/appendix/`
-- `outputs/tables/main/`
-- `outputs/tables/appendix/`
-- `data/processed/`
+- [RESEARCH_NOTE.md](RESEARCH_NOTE.md): full research note and evidence boundary.
+- [REAL_BTC_VALIDATION.md](REAL_BTC_VALIDATION.md): detailed real-data validation report.
+- [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md): one-page recruiter-facing summary.
+- `outputs/tables/main/`: machine-readable result tables.
+- `outputs/figures/real_btc_main/`: four primary real-data figures.
 
 ## Limitations
 
-- Synthetic-data dependence.
-- Queue position is proxied from displayed depth.
-- Event generation is simplified.
-- Hidden liquidity is not modeled.
-- Latency and partial fills are simplified.
-- No exchange-specific microstructure.
-- No real transaction-cost model.
-- No live execution or profitability claim.
+- Real BTC data are one-second aggregates, not order-level MBO.
+- Exact FIFO queue position, hidden liquidity, and exact passive fills are unobserved.
+- Intrasecond event ordering is unavailable.
+- The real-data result is a mechanism validation, not a trading strategy or live profitability claim.
 
-## Next Empirical Step
+## Next Empirical Requirement
 
-Run the unchanged labeling and evaluation pipeline on a single-venue BTC-USD L2 or L3 event stream.
-
+The next step is single-venue L3/MBO data with order identifiers, trades, cancellations, queue updates, and precise timestamps. That would allow the real layer to move from execution-pressure proxy validation to exact passive-fill analysis.

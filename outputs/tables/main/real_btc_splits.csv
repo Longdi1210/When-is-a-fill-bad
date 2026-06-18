@@ -1,0 +1,4 @@
+split,start_date_utc,end_date_utc
+train,2021-04-07,2021-04-13
+validation,2021-04-14,2021-04-16
+test,2021-04-17,2021-04-19

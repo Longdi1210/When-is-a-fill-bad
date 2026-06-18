@@ -1,0 +1,7 @@
+component,synthetic exact-fill result,real BTC proxy result,evidence boundary
+execution likelihood / pressure,Exact hypothetical fill labels and fill scores remain available.,One-second execution pressure proxy is observable; exact fill probability is not.,"Real data has aggregated pressure, not passive-order outcomes."
+post-fill or post-quote markout,Signed post-fill markout is measured after simulated fills.,Most adverse tested high-minus-low proxy contrast: -3.8072 bps.,"Real result is post-quote mid-price response, not realized fill markout."
+market-flow contribution,Flow variables are controlled in the generator.,Market-pressure-only proxy is benchmarked against richer proxies.,One-second aggregation prevents order-level causality claims.
+cancellation contribution,Cancellations can be exact in replay.,M2 versus M1 reports cancellation incremental value.,Cancellation fields are aggregate notionals by side/level.
+replenishment contribution,Limit replenishment is simulated explicitly.,M3 versus M2 reports replenishment incremental value.,"Limit fields are aggregate notionals, not individual orders."
+time-scale dependence,Event-window scans remain in the synthetic layer.,Mean real-minus-shuffle contrast across scale map: 0.1756 bps.,"Real analysis uses seconds, not event-time queue replay."

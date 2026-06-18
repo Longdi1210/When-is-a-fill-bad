@@ -1,0 +1,27 @@
+{
+  "timestamp_column": "system_time",
+  "timestamp_unit": "ISO-8601 string with microseconds",
+  "timezone": "UTC",
+  "start_datetime_utc": "2021-04-07T11:32:42.122161+00:00",
+  "end_datetime_utc": "2021-04-19T09:54:22.386544+00:00",
+  "row_count": 1030728,
+  "duplicate_timestamps": 0,
+  "duplicate_utc_seconds": 0,
+  "nominal_sampling_interval_seconds": 1,
+  "median_interval_seconds": 1.0,
+  "missing_one_second_intervals": 173,
+  "longest_gap_seconds": 30.000617,
+  "longest_gap_start": "2021-04-08T11:59:59.114732+00:00",
+  "longest_gap_end": "2021-04-08T12:00:29.115349+00:00",
+  "raw_file_size_bytes": 1755134589,
+  "raw_file_size_gb": 1.755134589,
+  "shape": [
+    1030728,
+    156
+  ],
+  "duplicate_rows": 0,
+  "missing_values_total": 0,
+  "visible_book_levels": 15,
+  "row_type": "mixed snapshot plus one-second interval aggregates",
+  "audit_runtime_seconds": 22.039748332987074
+}

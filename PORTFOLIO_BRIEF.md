@@ -2,33 +2,38 @@
 
 ## Question
 
-Can easier passive fills also be worse fills?
+Can easier passive execution coincide with worse execution quality?
 
 ## Why It Matters
 
-Fill likelihood and execution quality are different objects. A passive order can become easier to fill because the queue ahead is being depleted, while the post-fill price move can still be adverse.
+Passive orders are often ranked by execution likelihood, but a fast fill can be adverse if the quote is being consumed as the market moves through it. The project studies the gap between getting filled and getting a good fill.
 
 ## What I Built
 
-- Event-driven synthetic LOB experiment.
-- Hypothetical passive-order replay.
-- Queue-aware features.
-- Fill and signed-markout labels.
-- Chronological validation.
-- Leakage checks.
-- Nested model comparison.
-- Local shuffled-null diagnostic.
-- Reproducible figures and tables.
+- Controlled synthetic LOB experiment with exact hypothetical fills.
+- Side-adjusted post-fill markout labels.
+- Real Coinbase BTC validation using 1,030,728 one-second LOB observations.
+- Passive-side execution-pressure proxies for buy and sell quotes.
+- Timestamp-aware future markout labels.
+- Chronological train/validation/test design.
+- Nested model comparisons and pressure quantile tests.
+- Depth-conditioned, daily-stability, and local-null diagnostics.
 
 ## Evidence
 
-The pipeline separates execution likelihood from post-fill quality. In the current controlled run, fill-score bins show materially different fill rates and signed markouts. The proposed flow-depletion interaction remains unstable across event windows, so it is reported as a weak mechanism result rather than a discovery.
+The synthetic layer validates exact-fill mechanics. The real BTC layer shows partial empirical support: higher passive-side execution pressure is associated with worse future markout in selected regimes, especially passive-buy states on 2021-04-18. Cancellation and replenishment add small incremental information, but the full proxy is not uniformly stable across all days and horizons.
 
 ## Research Value
 
-The project demonstrates problem formulation, event-driven simulation, label design, side-adjusted evaluation, chronological validation, mechanism testing, negative-result discipline, and reproducibility.
+The project demonstrates research question design, data provenance control, label construction, leakage-aware validation, mechanism attribution, null testing, and honest reporting of mixed evidence.
 
-## Next Step
+## Boundary
 
-Run the unchanged pipeline on a single-venue BTC-USD L2 or L3 dataset.
+The real BTC data are one-second aggregates. Exact FIFO queue position and exact real passive fills are not observed.
 
+## Reproduce
+
+```bash
+make real-btc-validation
+python -m pytest tests
+```
