@@ -36,20 +36,18 @@ Real BTC validation
 | Available activity | market / limit / cancel notional |
 | Exact FIFO fills | unavailable |
 
-## What I Built
+## Research Components
 
-- Million-row real LOB data pipeline.
-- Schema audit and Parquet conversion.
-- Side-adjusted passive-buy and passive-sell markouts.
-- Synthetic exact-fill experiment.
-- Execution-pressure proxy family.
+- Million-row real LOB data pipeline with schema audit and Parquet conversion.
+- Synthetic exact-fill experiment for controlled passive-order replay.
+- Side-adjusted passive-buy and passive-sell markout construction.
+- Execution-pressure proxy family based on market flow, cancellation, replenishment, and displayed depth.
 - Chronological train/validation/test evaluation.
-- Multi-scale response analysis.
-- Day-level stability analysis.
-- Local shuffled-null test.
-- Reproducible Makefile pipeline and tests.
+- Multi-scale response analysis across formation windows and markout horizons.
+- Day-level stability analysis and local shuffled-null test.
+- Reproducible Makefile pipeline with focused tests.
 
-## What The Evidence Supports
+## Evidence Summary
 
 | Question | Result |
 |---|---|
@@ -78,9 +76,9 @@ Unsupported:
 - the local sequence mechanism is confirmed by the shuffled null;
 - the effect is stable across all days and horizons.
 
-## Why This Matters
+## Interpretation
 
-The project demonstrates how a plausible richer signal can fail to improve on a simpler baseline once chronological validation, horizon analysis, daily stability, and null tests are applied.
+The project shows how a plausible richer execution-pressure signal can fail to improve on a simpler baseline once chronological validation, horizon analysis, daily stability, and null tests are applied. That negative-result discipline is central to the research value: the pipeline preserves the mechanism hypothesis while making the evidence boundary explicit.
 
 ## Reproduction
 
