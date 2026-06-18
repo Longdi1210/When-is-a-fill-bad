@@ -1,23 +1,28 @@
 # When Is a Fill Bad?
-## Fill Likelihood, Quote Pressure, and Post-Quote Markout
+## Passive Quotes, Book Absorption, and Short-Horizon Markout
 
 **Can passive-side states associated with easier execution also produce worse post-fill or post-quote price outcomes?**
 
-This repository studies execution quality rather than generic price prediction. The synthetic layer provides exact hypothetical passive fills and signed post-fill markouts. The real Coinbase BTC layer cannot observe FIFO fills, so it validates the mechanism with quote-pressure shocks, visible-depth penetration, early book absorption, later quote survival, and future side-adjusted markout.
+The project started from a simple concern in passive execution: a quote may be easy to fill because the book is failing to absorb pressure. That is not automatically a good fill.
 
-The final audit uses a strict temporal design:
+There are two parts:
+
+- a synthetic order-book experiment, where passive fills and post-fill markouts are observed exactly;
+- a Coinbase BTC one-second book dataset, where exact FIFO fills are not available, so the real-data test uses quote-pressure shocks and later quote/price response.
+
+The main real-data test uses non-overlapping windows:
 
 ```text
-pre-shock state -> shock window [t-10s, t]
-early absorption observation -> (t, t+5s]
-future outcome -> (t+5s, t+5s+H]
+[t-10s, t]      pressure shock
+(t, t+5s]       early book absorption
+(t+5s, t+H]     later quote survival and markout
 ```
 
-The strict result is more conservative than the earlier descriptive result. The first five seconds of book response separate later quote survival and markout at short horizons, but the effect attenuates by 60 seconds and is not strongly separated from the expanded stratified null. This is now presented as a bounded predictive microstructure result, not a trading signal.
+The stricter timing test cuts down the earlier effect. The first five seconds of book response still separate later quote survival and markout at 10s and 30s. By 60s the effect is weaker, and the 200-seed stratified null is not decisive. I treat this as a short-horizon microstructure result, not as a trading signal.
 
 ![Strict temporal identification](outputs/figures/dynamic_lob_main/01_temporal_identification.png)
 
-## Data Boundary
+## Data
 
 | Item | Value |
 |---|---:|
@@ -31,7 +36,7 @@ The strict result is more conservative than the earlier descriptive result. The 
 | Exact FIFO fills | unavailable |
 | Live trading claim | none |
 
-## Main Strict Result
+## Main Result
 
 Absorption is measured only in the first 5 seconds after the shock. Future markout is then measured from the midpoint at `t+5s`, not from the pre-shock midpoint.
 
@@ -46,7 +51,7 @@ Absorption is measured only in the first 5 seconds after the shock. Future marko
 
 Positive strong-minus-weak markout means stronger early absorption is followed by better passive-side outcomes. The short-horizon result is supported on both sides; the 60-second result is weaker.
 
-## Null Result
+## Stratified Null
 
 The expanded stratified null uses 200 seeds and preserves date, side, shock-intensity bin, pre-shock depth bin, spread regime, volatility regime, and time-of-day block.
 
@@ -58,9 +63,9 @@ At 60 seconds:
 | sell | +0.4369 bps | +0.1226 bps | 0.6517 |
 | combined | +1.0881 bps | +0.1748 bps | 0.1542 |
 
-The null is directionally supportive for the buy side but not decisive. The final claim is therefore partial: strict early absorption contains short-horizon state information, while the longer-horizon and null-adjusted evidence is mixed.
+The null is directionally supportive for the buy side but not decisive. The conclusion is narrow: early absorption contains short-horizon state information; the longer-horizon and null-adjusted evidence is mixed.
 
-## Research System
+## Code And Outputs
 
 - Synthetic exact-fill experiment for controlled passive-order replay.
 - Real BTC data pipeline with schema audit, Parquet conversion, and canonical LOB features.
@@ -92,12 +97,9 @@ make reproduce
 - The strict result is strongest at 10s and 30s; longer-horizon evidence is mixed.
 - No live trading, market-making, optimal-execution, or profitability claim is made.
 
-## Review Path
+## Where To Look
 
-30 seconds: README figure and strict result table.
-
-3 minutes: [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md).
-
-15 minutes: [RESEARCH_NOTE.md](RESEARCH_NOTE.md).
-
-Code: `src/fillbad/`, `scripts/run_dynamic_lob_analysis.py`, and `tests/test_dynamic_lob.py`.
+- Short version: [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md)
+- Technical note: [RESEARCH_NOTE.md](RESEARCH_NOTE.md)
+- Main pipeline: `scripts/run_dynamic_lob_analysis.py`
+- Core tests: `tests/test_dynamic_lob.py`
