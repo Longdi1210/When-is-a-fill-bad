@@ -4,65 +4,43 @@
 
 Can market states associated with easier passive execution also produce worse execution quality?
 
-The project separates execution likelihood from execution quality. A passive quote can become easier to execute when visible liquidity is being consumed or withdrawn, but the subsequent price response can still be adverse to the passive trader.
+## 2. Why Fill Likelihood And Execution Quality Differ
 
-## 2. Why Fill Likelihood And Fill Quality Differ
-
-Fill likelihood asks whether a passive order executes. Fill quality asks what happens after execution. A fast fill can be valuable when it captures spread without adverse price movement, or harmful when the quote is being traded through.
+Fill likelihood asks whether a passive quote executes. Execution quality asks what happens after execution. A passive order can be easier to fill precisely when liquidity is being consumed or withdrawn, which may make the subsequent price response adverse.
 
 ## 3. Two-Layer Evidence Design
 
-The repository has two complementary layers:
+The project has two layers:
 
-- controlled synthetic exact-fill experiment;
-- real Coinbase BTC execution-pressure validation.
+- synthetic controlled data: exact hypothetical fills, fill likelihood, post-fill signed markout;
+- real Coinbase BTC data: passive-side execution-pressure proxy, future side-adjusted post-quote markout.
 
-The synthetic layer supports exact hypothetical fills and post-fill signed markouts. The real BTC layer does not contain exact passive fills, so it uses passive-side execution pressure as an empirical proxy for quote-consumption conditions.
+The real-data layer validates mechanism conditions. It is not an exact real-fill study.
 
 ## 4. Synthetic Exact-Fill Experiment
 
-The synthetic experiment submits hypothetical passive buy and sell orders at the best bid and best ask. It estimates fill likelihood and post-fill signed markout under controlled replay assumptions.
+The synthetic experiment submits passive buy and sell orders at the best bid and best ask. It constructs fill labels, time-to-fill, censoring, and signed post-fill markouts. It remains the exact-fill validation layer.
 
-Current synthetic results show that fill-score bins can have different realized fill rates and different signed markouts. The flow-depletion interaction remains weak and is not reported as a strong discovery.
+The synthetic result supports the core distinction between fill likelihood and markout, but the richer flow-depletion interaction is weak and unstable.
 
 ## 5. Real BTC Data And Provenance
 
-The real dataset is `data/processed/kaggle_btc_canonical.parquet`.
-
 | Item | Value |
 |---|---:|
+| Dataset | Coinbase BTC one-second LOB/order-flow table |
 | Rows | 1,030,728 |
-| Canonical columns | 61 |
 | Date range | 2021-04-07 11:32:42 UTC to 2021-04-19 09:54:22 UTC |
-| Sampling | Approximately one second |
 | Visible depth | 15 levels |
-| Activity fields | market, limit, cancellation notional |
+| Activity fields | market, limit, cancel notional |
+| Data type | mixed snapshot + one-second interval aggregates |
 
-The data are mixed LOB snapshots plus one-second interval aggregates.
+Unsupported: exact FIFO queue position, exact passive fills, hidden liquidity, and intrasecond event ordering.
 
-## 6. Evidence Boundary
+## 6. Passive-Side Execution-Pressure Proxies
 
-The real BTC layer supports pressure and markout analysis, not exact execution reconstruction.
+Each valid timestamp creates two observations: passive buy at the best bid and passive sell at the best ask.
 
-Unsupported in the real data:
-
-- exact FIFO queue position;
-- exact order-level passive fills;
-- hidden liquidity;
-- exact intrasecond event ordering.
-
-## 7. Passive-Side Execution-Pressure Proxies
-
-Each timestamp creates two passive-side observations:
-
-- passive buy at the best bid;
-- passive sell at the best ask.
-
-For passive buys, aggressive pressure is market sells; same-side cancellation is bid cancellation; replenishment is bid limit notional; passive depth is visible bid depth.
-
-For passive sells, aggressive pressure is market buys; same-side cancellation is ask cancellation; replenishment is ask limit notional; passive depth is visible ask depth.
-
-The main proxy family is:
+For passive buys, pressure uses market sells, bid cancellation, bid limit replenishment, and visible bid depth. For passive sells, pressure uses market buys, ask cancellation, ask limit replenishment, and visible ask depth.
 
 ```text
 P1 = market pressure / visible passive depth
@@ -70,9 +48,18 @@ P2 = (market pressure + same-side cancellation) / visible passive depth
 P3 = (market pressure + same-side cancellation - same-side replenishment) / visible passive depth
 ```
 
-All signs are from the passive trader's perspective. Positive future markout is favorable; negative future markout is adverse.
+## 7. Side-Adjusted Markout
 
-## 8. Chronological Experimental Design
+Markout is measured in basis points. Positive is favorable for the passive trader; negative is adverse.
+
+```text
+buy markout  =  10^4 log(mid_{t+H} / mid_t)
+sell markout = -10^4 log(mid_{t+H} / mid_t)
+```
+
+Future labels use timestamp-aware joins rather than row offsets.
+
+## 8. Chronological Split
 
 | Split | Dates |
 |---|---|
@@ -80,95 +67,109 @@ All signs are from the passive trader's perspective. Positive future markout is 
 | validation | 2021-04-14 to 2021-04-16 |
 | test | 2021-04-17 to 2021-04-19 |
 
-Formation windows are `[1, 2, 5, 10, 30, 60]` seconds. Future markout horizons are `[1, 5, 10, 30, 60, 300]` seconds.
+Formation windows: `[1, 2, 5, 10, 30, 60]` seconds.
 
-Pressure quantile boundaries and the display scale are selected without using the test set. The selected display scale is `W=10s, H=60s`.
+Markout horizons: `[1, 5, 10, 30, 60, 300]` seconds.
 
-## 9. Main Nonparametric Result
+The display configuration selected from train/validation is `W=10s, H=60s`.
 
-On the untouched test set, the full depth-normalized P3 proxy has an average high-minus-low markout contrast of `-0.8872 bps` at `W=10s, H=60s`. Negative means higher execution pressure is associated with worse passive-side future markout.
+## 9. Main Result
 
-This result is directional but conditional rather than uniform.
+At `W=10s, H=60s` on the untouched test set:
 
-## 10. Incremental Role Of Cancellation
+| Proxy | High-minus-low markout |
+|---|---:|
+| P1 market-only | -0.2347 bps |
+| P2 market + cancel | +1.2222 bps |
+| P3 full depth-normalized | -0.8872 bps |
 
-The mean test incremental R2 from adding cancellation to market pressure is:
+Execution pressure shows adverse ordering in selected short/intermediate-horizon configurations, but the richer proxy does not robustly beat the simpler market-only signal.
 
-```text
-M2 - M1 = +0.000102
-```
+## 10. Market-Only Versus Richer Proxies
 
-The effect is positive but small. It should be interpreted as modest incremental information, not a large economic effect.
+At `W=10s, H=60s`:
 
-## 11. Incremental Role Of Replenishment
+| Quantity | Value |
+|---|---:|
+| Cancellation increment R2 | +0.000160 |
+| Replenishment increment R2 | -0.000268 |
+| Full proxy vs controls R2 | -0.000649 |
+| Market-only rank correlation | +0.089046 |
+| Full-proxy rank correlation | +0.085100 |
 
-The mean test incremental R2 from adding replenishment is:
+P2 changes sign relative to P3, and P3 remains adverse. However, the richer proxy does not improve the model metrics.
 
-```text
-M3 - M2 = +0.000124
-```
+## 11. Formation-Window By Response-Horizon Result
 
-The P2-to-P3 sign reversal is more informative than the average R2 increment. At `W=10s, H=60s`, P2 is positive while P3 is negative because subtracting same-side replenishment changes which states enter the high-pressure bucket.
+P3 test high-minus-low markout:
 
-## 12. Depth-Conditioned Mechanism
+| H \\ W | 1 | 2 | 5 | 10 | 30 | 60 |
+|---:|---:|---:|---:|---:|---:|---:|
+| 1s | -0.1681 | -0.1417 | -0.0964 | -0.0803 | -0.0422 | -0.0472 |
+| 5s | -0.2615 | -0.2179 | -0.1763 | -0.1718 | -0.1336 | -0.1731 |
+| 10s | -0.2870 | -0.2558 | -0.2489 | -0.2659 | -0.2314 | -0.3360 |
+| 30s | -0.4948 | -0.4398 | -0.4928 | -0.5880 | -0.5909 | -1.0367 |
+| 60s | -0.6576 | -0.6016 | -0.6878 | -0.8872 | -1.1081 | -2.1007 |
+| 300s | -0.3484 | -0.2178 | -0.2614 | +0.0503 | +1.2142 | +2.0954 |
 
-The pressure effect is regime-dependent. In the mechanism audit, passive-buy P3 is most adverse on 2021-04-18 and in high-volatility states. Depth normalization attenuates the raw P3 adverse contrast, so low displayed depth contributes to extreme values but does not by itself create the full effect.
+## 12. 300-Second Dissipation And Reversal
 
-## 13. Multi-Scale Response
+The adverse ordering is strongest at short and intermediate horizons. It dissipates and reverses at 300 seconds for longer formation windows. This is a horizon-dependent result; it should not be labeled mean reversion without a separate test.
 
-The formation-window by response-horizon map is stored in `outputs/figures/real_btc_main/04_formation_response_map.png`. It shows a conditional response pattern rather than one stable universal time scale.
+## 13. Daily Stability And 2021-04-18 Concentration
 
-## 14. Daily Stability
+| Date | Side | High-minus-low markout |
+|---|---|---:|
+| 2021-04-17 | buy | -0.0351 |
+| 2021-04-18 | buy | -5.5869 |
+| 2021-04-19 | buy | +0.0834 |
+| 2021-04-17 | sell | +0.7801 |
+| 2021-04-18 | sell | -1.2803 |
+| 2021-04-19 | sell | -0.5667 |
 
-The selected P3 result is day-dependent:
+The aggregate buy-side result is materially influenced by 2021-04-18.
 
-- buy side, 2021-04-18: strongly adverse;
-- buy side, 2021-04-17 and 2021-04-19: weak or near neutral;
-- sell side: mixed.
+## 14. Local Shuffled-Null Result
 
-Removing 2021-04-18 changes the average P3 contrast to `+0.2366 bps`, so the main real-data effect is not stable across all test days.
+| Null statistic | Value |
+|---|---:|
+| Mean real-minus-shuffle | +0.1756 bps |
+| Median real-minus-shuffle | -0.0542 bps |
+| Share real more adverse | 56.94% |
+| Mean real | -0.2914 bps |
+| Mean shuffled | -0.4669 bps |
 
-## 15. Local-Null Test
+The local null does not support a strong sequence-specific mechanism.
 
-The local 5-minute shuffled null preserves broad regimes while disrupting local alignment between pressure and future markout. The mean real-minus-shuffled high-minus-low contrast is `+0.1756 bps`, which does not support a strong sequence-effect claim across all scales.
+## 15. Supported Findings
 
-## 16. Synthetic-Real Comparison
+- The real BTC pipeline is complete and reproducible.
+- Side-adjusted post-quote markouts are timestamp-aware.
+- Short/intermediate adverse ordering appears in selected configurations.
+- Market-order pressure gives the clearest simple ordering.
 
-The synthetic layer tests exact-fill logic. The real layer tests whether related pressure states appear in real one-second Coinbase BTC data.
+## 16. Partially Supported Findings
 
-The two layers are not numerically comparable. They are evidence complements:
+- Full execution pressure carries information in selected regimes.
+- The effect is stronger for specific days and horizons.
+- Cancellation and replenishment help diagnose regimes, but not as stable performance improvements.
 
-- synthetic: exact hypothetical fill and post-fill markout;
-- real BTC: execution-pressure proxy and post-quote side-adjusted markout.
+## 17. Unsupported Findings
 
-## 17. Supported Findings
+- The full proxy robustly beats market-only.
+- Cancellation and replenishment add stable incremental value.
+- The local shuffled null confirms a local sequence mechanism.
+- The effect is stable across all days and horizons.
+- Real data provide exact passive fill probabilities.
 
-- The project cleanly separates execution likelihood from execution quality.
-- Synthetic exact-fill labels and markouts are reproducible.
-- Real BTC passive-side pressure proxies can be built from market, cancel, limit, and depth fields.
-- Higher pressure states show more adverse passive-side markout in selected regimes.
+## 18. Limitations
 
-## 18. Partially Supported Findings
+- One-second aggregation removes intrasecond ordering.
+- Exact FIFO fills are unavailable.
+- The sample covers one venue and a short date range.
+- Hidden liquidity, fees, latency, and partial fills are not modeled.
+- No live trading or profitability claim is made.
 
-- Cancellation and replenishment add small incremental information beyond market flow.
-- The P3 proxy helps in selected regimes, especially passive-buy / high-volatility / 2021-04-18 states.
-- The time-scale result is conditional, not a single stable characteristic scale.
+## 19. What Exact L3 Data Would Be Required Next
 
-## 19. Unsupported Findings
-
-- Real BTC exact passive fill probability is not observed.
-- FIFO queue reconstruction is not supported by the one-second aggregate data.
-- The full composite proxy does not dominate controls across every side, day, window, and horizon.
-- The local-null result does not justify a strong causal sequence claim.
-
-## 20. Limitations
-
-- One-second aggregation hides intrasecond ordering.
-- Hidden liquidity is unavailable.
-- Real passive executions are not labeled.
-- Fees, rebates, latency, and partial fills are not modeled in the real layer.
-- The current result is a mechanism validation, not a trading strategy.
-
-## 21. What Exact Real-Fill Data Would Be Required Next
-
-The next empirical requirement is single-venue L3/MBO data with order identifiers, trades, cancellations, queue updates, and timestamps precise enough to reconstruct queue position. That would allow the real-data layer to move from execution-pressure proxy validation to exact passive-fill analysis.
+The next empirical step would require single-venue order-level L3/MBO data with order identifiers, trades, cancellations, queue updates, and sufficiently precise timestamps. That would allow exact passive fill analysis rather than proxy validation.

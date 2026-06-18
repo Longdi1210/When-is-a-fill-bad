@@ -28,7 +28,7 @@ from fillbad.real_validation import (
 TABLE_DIR = Path("outputs/tables/main")
 FIGURE_DIR = Path("outputs/figures/real_btc_main")
 APPENDIX_FIGURE_DIR = Path("outputs/figures/appendix/real_btc")
-REPORT = Path("REAL_BTC_VALIDATION.md")
+REPORT = Path("archive/codex_intermediate/REAL_BTC_VALIDATION.md")
 
 
 def load_inputs() -> tuple[pd.DataFrame, pd.DataFrame]:
@@ -463,21 +463,32 @@ def synthetic_real_comparison(proxy_results: pd.DataFrame, nested: pd.DataFrame,
     )
 
 
-def plot_pressure_vs_markout(quantiles: pd.DataFrame, window: int) -> None:
-    test = quantiles[(quantiles["split"] == "test") & (quantiles["formation_window"] == window)]
-    horizons = [1, 5, 30, 60]
+def plot_pressure_vs_markout(side_frames: dict[str, pd.DataFrame], split: pd.DataFrame, window: int, horizon: int) -> None:
+    rows = []
+    for side, frame in side_frames.items():
+        masks = split_masks(frame, split)
+        for proxy, column in {
+            "P1 market-only": f"p1_market_{window}s",
+            "P3 full proxy": f"p3_depth_norm_{window}s",
+        }.items():
+            edges = train_quantile_bins(frame[column], masks["train"])
+            quantile = apply_bins(frame[column], edges)
+            markout = f"markout_bps_{horizon}s"
+            test = pd.DataFrame({"quantile": quantile.loc[masks["test"]], "markout": frame.loc[masks["test"], markout]}).dropna()
+            grouped = test.groupby("quantile", as_index=False).agg(mean=("markout", "mean"), n=("markout", "size"))
+            grouped["proxy"] = proxy
+            grouped["side"] = side
+            rows.append(grouped)
+    plot_data = pd.concat(rows).groupby(["proxy", "quantile"], as_index=False).agg(mean=("mean", "mean"), n=("n", "sum"))
     fig, ax = plt.subplots(figsize=(8, 4.5))
-    for horizon in horizons:
-        subset = test[test["horizon"] == horizon].groupby("pressure_quantile", as_index=False).agg(
-            mean=("mean_markout_bps", "mean"), lo=("ci_low", "mean"), hi=("ci_high", "mean"), n=("observation_count", "sum")
-        )
-        ax.plot(subset["pressure_quantile"], subset["mean"], marker="o", label=f"{horizon}s")
-        ax.fill_between(subset["pressure_quantile"], subset["lo"], subset["hi"], alpha=0.12)
+    for proxy, group in plot_data.groupby("proxy"):
+        ax.plot(group["quantile"], group["mean"], marker="o", label=proxy)
     ax.axhline(0, color="black", linewidth=0.8)
-    ax.set_title(f"Execution Pressure Versus Passive-Side Markout, W={window}s")
-    ax.set_xlabel("Train-defined execution-pressure quantile")
-    ax.set_ylabel("Mean side-adjusted future markout (bps)")
-    ax.legend(title="Horizon")
+    ax.set_title(f"Pressure Quantiles and Future Markout, W={window}s, H={horizon}s")
+    ax.set_xlabel("Train-defined pressure quantile")
+    ax.set_ylabel("Test mean side-adjusted markout (bps)")
+    ax.legend(title="Proxy")
+    ax.text(0.01, -0.22, "Negative values are adverse for the passive trader.", transform=ax.transAxes, fontsize=9)
     fig.tight_layout()
     fig.savefig(FIGURE_DIR / "01_pressure_vs_markout.png", dpi=170)
     plt.close(fig)
@@ -525,23 +536,33 @@ def formation_response_results(proxy_table: pd.DataFrame) -> pd.DataFrame:
 
 def plot_incremental_components(increments: pd.DataFrame, window: int, horizon: int) -> None:
     data = increments[(increments["formation_window"] == window) & (increments["horizon"] == horizon)]
-    summary = pd.DataFrame(
-        {
-            "metric": ["M2-M1 cancel", "M3-M2 replenish", "M4-M0 proxy"],
-            "mean_incremental_r2": [
-                data["cancel_increment_r2"].mean(),
-                data["replenishment_increment_r2"].mean(),
-                data["full_proxy_increment_r2_vs_controls"].mean(),
-            ],
-        }
-    )
-    fig, ax = plt.subplots(figsize=(7.5, 4.2))
-    ax.bar(summary["metric"], summary["mean_incremental_r2"], color=["#4c78a8", "#72b7b2", "#f58518"])
-    ax.axhline(0, color="black", linewidth=0.8)
-    ax.set_title(f"Incremental Component Value, W={window}s, H={horizon}s")
-    ax.set_xlabel("Nested comparison")
-    ax.set_ylabel("Mean test incremental R2")
-    ax.tick_params(axis="x", rotation=12)
+    models = ["M0 controls", "M1 market", "M2 + cancel", "M3 + replenish", "M4 full proxy"]
+    r2_values = [
+        0.0,
+        np.nan,
+        data["cancel_increment_r2"].mean(),
+        data["replenishment_increment_r2"].mean(),
+        data["full_proxy_increment_r2_vs_controls"].mean(),
+    ]
+    rank_values = [
+        np.nan,
+        data["market_only_rank_correlation"].mean(),
+        np.nan,
+        np.nan,
+        data["full_proxy_rank_correlation"].mean(),
+    ]
+    fig, axes = plt.subplots(1, 2, figsize=(9, 4.2))
+    axes[0].bar(models, r2_values, color="#4c78a8")
+    axes[0].axhline(0, color="black", linewidth=0.8)
+    axes[0].set_title("Incremental R2")
+    axes[0].set_ylabel("Test incremental R2")
+    axes[0].tick_params(axis="x", rotation=25)
+    axes[1].bar(models, rank_values, color="#72b7b2")
+    axes[1].axhline(0, color="black", linewidth=0.8)
+    axes[1].set_title("Rank Correlation")
+    axes[1].set_ylabel("Test Spearman rank correlation")
+    axes[1].tick_params(axis="x", rotation=25)
+    fig.suptitle(f"Incremental Component Value, W={window}s, H={horizon}s", y=0.99)
     fig.tight_layout()
     fig.savefig(FIGURE_DIR / "02_incremental_components.png", dpi=170)
     plt.close(fig)
@@ -590,7 +611,7 @@ def plot_pressure_depth_map(side_frames: dict[str, pd.DataFrame], split: pd.Data
     ax.set_ylabel("Visible-depth quintile")
     fig.colorbar(im, ax=ax, label="Mean side-adjusted markout (bps)")
     fig.tight_layout()
-    fig.savefig(FIGURE_DIR / "03_pressure_depth_map.png", dpi=170)
+    fig.savefig(APPENDIX_FIGURE_DIR / "pressure_depth_map.png", dpi=170)
     plt.close(fig)
 
 
@@ -607,7 +628,31 @@ def plot_formation_response_map(proxy_table: pd.DataFrame) -> None:
     ax.set_yticks(range(len(matrix.index)), matrix.index)
     fig.colorbar(im, ax=ax, label="High-minus-low markout (bps)")
     fig.tight_layout()
-    fig.savefig(FIGURE_DIR / "04_formation_response_map.png", dpi=170)
+    fig.savefig(FIGURE_DIR / "03_formation_response_map.png", dpi=170)
+    plt.close(fig)
+
+
+def plot_daily_and_null_stability(daily: pd.DataFrame, null: pd.DataFrame) -> None:
+    fig, axes = plt.subplots(1, 2, figsize=(10, 4.2))
+    for side, group in daily.groupby("side"):
+        axes[0].plot(group["date"], group["high_minus_low_markout"], marker="o", label=side)
+    axes[0].axhline(0, color="black", linewidth=0.8)
+    axes[0].set_title("Daily Test Stability")
+    axes[0].set_xlabel("Test day")
+    axes[0].set_ylabel("High-minus-low markout (bps)")
+    axes[0].tick_params(axis="x", rotation=20)
+    axes[0].legend(title="Side")
+
+    pivot = null.pivot_table(index=["side", "formation_window", "horizon"], columns="sequence", values="high_minus_low_markout_bps").dropna()
+    pivot["real_minus_shuffle"] = pivot["real"] - pivot["local_block_shuffle"]
+    axes[1].hist(pivot["real_minus_shuffle"], bins=18, color="#f58518", alpha=0.85)
+    axes[1].axvline(0, color="black", linewidth=0.8)
+    axes[1].set_title("Real Minus Local-Shuffled Null")
+    axes[1].set_xlabel("Difference in high-minus-low markout (bps)")
+    axes[1].set_ylabel("Cell count")
+    fig.suptitle("Daily and Null Stability", y=0.99)
+    fig.tight_layout()
+    fig.savefig(FIGURE_DIR / "04_daily_and_null_stability.png", dpi=170)
     plt.close(fig)
 
 
@@ -832,6 +877,7 @@ The dataset is one-second aggregated, not order-level MBO. Hidden liquidity, lat
 
 Runtime: {runtime:.2f} seconds.
 """
+    REPORT.parent.mkdir(parents=True, exist_ok=True)
     REPORT.write_text(text)
 
 
@@ -872,11 +918,12 @@ def main() -> None:
     depth_conditioned_results(mechanism).to_csv(TABLE_DIR / "depth_conditioned_results.csv", index=False)
     formation_response_results(proxy_table).to_csv(TABLE_DIR / "formation_response_results.csv", index=False)
 
-    plot_pressure_vs_markout(quantiles, selected_window)
+    plot_pressure_vs_markout(side_frames, split, selected_window, selected_horizon)
     plot_incremental_components(increments, selected_window, selected_horizon)
     plot_proxy_comparison(proxy_table, selected_window, selected_horizon)
     plot_pressure_depth_map(side_frames, split, selected_window, selected_horizon)
     plot_formation_response_map(proxy_table)
+    plot_daily_and_null_stability(daily, null)
     plot_component_contribution(mechanism)
     plot_sign_reversal_decomposition(mechanism)
     plot_leave_one_day_out(loo)

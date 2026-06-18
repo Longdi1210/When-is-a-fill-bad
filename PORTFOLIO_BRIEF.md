@@ -1,39 +1,55 @@
 # Portfolio Brief
 
-## Question
+## Problem
 
-Can easier passive execution coincide with worse execution quality?
+Can easy passive execution coincide with poor execution quality?
 
-## Why It Matters
+## Data
 
-Passive orders are often ranked by execution likelihood, but a fast fill can be adverse if the quote is being consumed as the market moves through it. The project studies the gap between getting filled and getting a good fill.
+- 1,030,728 real Coinbase BTC observations.
+- 15 LOB levels.
+- Market, limit, and cancel notional.
+- 2021-04-07 to 2021-04-19 UTC.
 
 ## What I Built
 
-- Controlled synthetic LOB experiment with exact hypothetical fills.
-- Side-adjusted post-fill markout labels.
-- Real Coinbase BTC validation using 1,030,728 one-second LOB observations.
-- Passive-side execution-pressure proxies for buy and sell quotes.
-- Timestamp-aware future markout labels.
-- Chronological train/validation/test design.
-- Nested model comparisons and pressure quantile tests.
-- Depth-conditioned, daily-stability, and local-null diagnostics.
+- Controlled synthetic exact-fill layer.
+- Real execution-pressure proxy layer.
+- Side-adjusted markouts.
+- Chronological evaluation.
+- Multi-scale heatmap.
+- Daily stability analysis.
+- Local shuffled null.
+- Reproducible pipeline.
 
-## Evidence
+## Main Finding
 
-The synthetic layer validates exact-fill mechanics. The real BTC layer shows partial empirical support: higher passive-side execution pressure is associated with worse future markout in selected regimes, especially passive-buy states on 2021-04-18. Cancellation and replenishment add small incremental information, but the full proxy is not uniformly stable across all days and horizons.
+Market-order pressure provides the most stable simple ordering of future markout. Adding cancellation and replenishment does not robustly improve out-of-sample performance. The adverse relation is strongest at short and intermediate horizons and is concentrated in selected days.
 
-## Research Value
+| Question | Result |
+|---|---|
+| Does execution pressure order future markout? | Partly, at short/intermediate horizons |
+| Does full proxy beat market-only? | No |
+| Do cancellation and replenishment add stable value? | No |
+| Is the effect stable by day? | No, one day materially influences the buy side |
+| Does the local null confirm sequence structure? | No |
+| Is the pipeline reproducible? | Yes |
 
-The project demonstrates research question design, data provenance control, label construction, leakage-aware validation, mechanism attribution, null testing, and honest reporting of mixed evidence.
+## Research Judgment
 
-## Boundary
+The project rejects a stronger composite-signal hypothesis instead of tuning until it appears successful.
 
-The real BTC data are one-second aggregates. Exact FIFO queue position and exact real passive fills are not observed.
+## Visible Skills
 
-## Reproduce
+- High-frequency data engineering.
+- Time-aware feature construction.
+- Leakage control.
+- Model comparison.
+- Null testing.
+- Regime analysis.
+- Reproducibility.
+- Mechanism interpretation.
 
-```bash
-make real-btc-validation
-python -m pytest tests
-```
+## Evidence Boundary
+
+Real data validates quote-consumption conditions, not exact FIFO fills.

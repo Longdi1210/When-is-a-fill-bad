@@ -98,4 +98,4 @@ The detailed mechanism table is `outputs/tables/main/real_btc_mechanism_audit.cs
 
 The dataset is one-second aggregated, not order-level MBO. Hidden liquidity, latency, partial fills, and queue priority are not observed. The real-data result is a mechanism validation of post-quote price response, not a deployable trading claim.
 
-Runtime: 327.92 seconds.
+Runtime: 330.64 seconds.

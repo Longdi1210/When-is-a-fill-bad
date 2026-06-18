@@ -1,82 +1,92 @@
 # When Is a Fill Bad?
+## Synthetic Exact Fills and Real BTC Execution-Pressure Validation
 
-**Can easier passive execution coincide with worse execution quality?**
+**Can market states associated with easier passive execution also produce worse execution quality?**
 
-This repository studies that question with two complementary layers: a controlled synthetic exact-fill experiment and a real Coinbase BTC execution-pressure validation using 1,030,728 one-second LOB observations.
+In the real BTC sample, execution-pressure proxies produce adverse post-quote ordering at short and intermediate horizons. A richer proxy combining market pressure, cancellation, and replenishment does not robustly outperform market-order pressure alone. The effect is horizon-dependent, day-dependent, and not clearly separated from a local shuffled null.
 
-The main real-data result is restrained: higher passive-side execution pressure is associated with more adverse future markout in selected regimes, especially passive-buy states on 2021-04-18, but the effect is not uniformly stable across all days, sides, and horizons.
+The real-data layer uses execution pressure as a proxy because exact FIFO fills are not observed in the one-second aggregated dataset.
 
-**Boundary:** the real BTC data do not contain exact order-level passive fills or FIFO queue position. Execution pressure is used as a proxy for quote-consumption conditions.
+![Formation-window by response-horizon map](outputs/figures/real_btc_main/03_formation_response_map.png)
 
-![Pressure quantiles and future markout](outputs/figures/real_btc_main/01_pressure_vs_markout.png)
+*Execution pressure orders future passive-side markout at short and intermediate horizons, while the relation weakens and reverses at longer horizons.*
 
 ## Evidence Design
 
-| Layer | What it measures | Evidence boundary |
-|---|---|---|
-| Synthetic controlled experiment | exact hypothetical fills, fill likelihood, post-fill signed markout | simulated queue and event assumptions |
-| Real Coinbase BTC validation | passive-side execution pressure, post-quote side-adjusted markout | one-second aggregates, no exact fills |
+```text
+Synthetic controlled experiment
+-> exact hypothetical fills
+-> fill likelihood
+-> post-fill markout
 
-## What Was Built
+Real BTC validation
+-> execution-pressure proxy
+-> future side-adjusted markout
+```
 
-- Event-driven synthetic LOB replay with passive buy/sell orders.
-- Fill, censoring, and signed post-fill markout labels.
-- Real BTC schema audit and Parquet conversion.
-- Side-specific passive quote observations for buy and sell sides.
-- Execution-pressure proxies: market pressure, market + cancellation, market + cancellation - replenishment.
-- Timestamp-aware future markout labels.
-- Chronological train/validation/test evaluation.
-- Nested model comparison, depth-conditioned analysis, local shuffled null, and daily stability audit.
+## Data
 
-## Key Results
-
-| Quantity | Result |
+| Item | Value |
 |---|---:|
-| Real BTC rows | 1,030,728 |
-| Train period | 2021-04-07 to 2021-04-13 |
-| Validation period | 2021-04-14 to 2021-04-16 |
-| Test period | 2021-04-17 to 2021-04-19 |
-| Selected real-data display scale | W=10s, H=60s |
-| P1 market-only high-minus-low markout | -0.2347 bps |
-| P2 market+cancel high-minus-low markout | +1.2222 bps |
-| P3 full depth-normalized high-minus-low markout | -0.8872 bps |
-| Buy-side P3 contrast | -1.6516 bps |
-| Sell-side P3 contrast | -0.1228 bps |
+| Real dataset | Coinbase BTC |
+| Rows | 1,030,728 |
+| Frequency | ~1 second |
+| Book depth | 15 levels |
+| Date range | 2021-04-07 to 2021-04-19 UTC |
+| Available activity | market / limit / cancel notional |
+| Exact FIFO fills | unavailable |
 
-The P2-to-P3 sign reversal is explained by replenishment: cancellation-only sorting is favorable on average, while the negative-replenishment component pulls raw P3 negative. Depth normalization attenuates the raw adverse contrast rather than creating it.
+## What I Built
 
-## Supported, Partial, Unsupported
+- Million-row real LOB data pipeline.
+- Schema audit and Parquet conversion.
+- Side-adjusted passive-buy and passive-sell markouts.
+- Synthetic exact-fill experiment.
+- Execution-pressure proxy family.
+- Chronological train/validation/test evaluation.
+- Multi-scale response analysis.
+- Day-level stability analysis.
+- Local shuffled-null test.
+- Reproducible Makefile pipeline and tests.
+
+## What The Evidence Supports
+
+| Question | Result |
+|---|---|
+| Does execution pressure order future markout? | Partly, at short/intermediate horizons |
+| Does full proxy beat market-only? | No |
+| Do cancellation and replenishment add stable value? | No |
+| Is the effect stable by day? | No, one day materially influences the buy side |
+| Does the local null confirm sequence structure? | No |
+| Is the pipeline reproducible? | Yes |
 
 Supported:
 
-- the project cleanly separates execution likelihood from execution quality;
-- real BTC pressure proxies can be constructed from market, cancellation, limit, and depth fields;
-- selected high-pressure regimes have worse side-adjusted future markout.
+- complete and reproducible real BTC proxy pipeline;
+- short/intermediate adverse ordering in selected scales;
+- market-order pressure provides the clearest simple ordering.
 
 Partially supported:
 
-- cancellation and replenishment add small incremental information beyond market flow;
-- the adverse proxy result is stronger for passive buys and high-volatility / 2021-04-18 regimes.
+- full execution pressure carries information in selected regimes;
+- the effect is stronger on specific days and horizons.
 
 Unsupported:
 
-- exact real passive fill probability;
-- FIFO queue reconstruction;
-- a universal stable pressure-to-adverse-markout law.
+- cancellation and replenishment add stable incremental value;
+- the full proxy robustly beats market-only;
+- the local sequence mechanism is confirmed by the shuffled null;
+- the effect is stable across all days and horizons.
 
-## Reproduce
+## Why This Matters
 
-The raw CSV is intentionally not committed. Once `data/processed/kaggle_btc_canonical.parquet` exists, run:
+The project demonstrates how a plausible richer signal can fail to improve on a simpler baseline once chronological validation, horizon analysis, daily stability, and null tests are applied.
+
+## Reproduction
 
 ```bash
 make real-btc-validation
 python -m pytest tests
-```
-
-To rebuild the real-data audit and canonical table from the local raw CSV:
-
-```bash
-make real-btc
 ```
 
 Synthetic validation remains available:
@@ -85,21 +95,23 @@ Synthetic validation remains available:
 make reproduce
 ```
 
-## Main Files
-
-- [RESEARCH_NOTE.md](RESEARCH_NOTE.md): full research note and evidence boundary.
-- [REAL_BTC_VALIDATION.md](REAL_BTC_VALIDATION.md): detailed real-data validation report.
-- [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md): one-page recruiter-facing summary.
-- `outputs/tables/main/`: machine-readable result tables.
-- `outputs/figures/real_btc_main/`: four primary real-data figures.
-
 ## Limitations
 
-- Real BTC data are one-second aggregates, not order-level MBO.
-- Exact FIFO queue position, hidden liquidity, and exact passive fills are unobserved.
-- Intrasecond event ordering is unavailable.
-- The real-data result is a mechanism validation, not a trading strategy or live profitability claim.
+- Exact real fills are unavailable.
+- One-second aggregation removes intrasecond event order.
+- The sample covers one venue and one short period.
+- `2021-04-18` materially influences the buy-side aggregate.
+- Null results limit sequence-mechanism claims.
+- No live trading or profitability claim.
 
-## Next Empirical Requirement
+## How To Review This Project
 
-The next step is single-venue L3/MBO data with order identifiers, trades, cancellations, queue updates, and precise timestamps. That would allow the real layer to move from execution-pressure proxy validation to exact passive-fill analysis.
+30 seconds: README summary and hero figure.
+
+3 minutes: [PORTFOLIO_BRIEF.md](PORTFOLIO_BRIEF.md).
+
+15 minutes: [RESEARCH_NOTE.md](RESEARCH_NOTE.md).
+
+Code: `src/fillbad/`.
+
+Full methodology and results: [RESEARCH_NOTE.md](RESEARCH_NOTE.md)
